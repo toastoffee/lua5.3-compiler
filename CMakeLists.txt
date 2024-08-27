@@ -3,4 +3,7 @@ project(lua5_3_compiler)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(lua5_3_compiler main.cpp)
+add_executable(lua5_3_compiler main.cpp
+        src/types.hpp
+        src/lexer/token.h
+)
