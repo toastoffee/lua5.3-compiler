@@ -10,10 +10,15 @@
 
 
 
-#ifndef LUA5_3_COMPILER_TOKEN_H
-#define LUA5_3_COMPILER_TOKEN_H
+#ifndef LUA5_3_COMPILER_TOKEN_HPP
+#define LUA5_3_COMPILER_TOKEN_HPP
 
-enum class Token : unsigned int {
+#include <string>
+#include <map>
+
+#include <types.hpp>
+
+enum class TokenId : u8 {
     TOKEN_EOF         = 0,                  // end-of-file
     TOKEN_VARARG      = 1,                  // ...
     TOKEN_SEP_SEMI    = 2,                  // ;
@@ -79,4 +84,35 @@ enum class Token : unsigned int {
     TOKEN_OP_BXOR     = TOKEN_OP_WAVE
 };
 
-#endif //LUA5_3_COMPILER_TOKEN_H
+struct Token {
+    TokenId id;
+    int line;
+    std::string tokenStr;
+};
+
+std::map<std::string, TokenId> keywords {
+        {"and",     TokenId::TOKEN_OP_AND},
+        {"break",   TokenId::TOKEN_KW_BREAK},
+        {"do",      TokenId::TOKEN_KW_DO},
+        {"else",    TokenId::TOKEN_KW_ELSE},
+        {"elseif",  TokenId::TOKEN_KW_ELSEIF},
+        {"end",     TokenId::TOKEN_KW_END},
+        {"false",   TokenId::TOKEN_KW_FALSE},
+        {"for",     TokenId::TOKEN_KW_FOR},
+        {"function",TokenId::TOKEN_KW_FUNCTION},
+        {"goto",    TokenId::TOKEN_KW_GOTO},
+        {"if",      TokenId::TOKEN_KW_IF},
+        {"in",      TokenId::TOKEN_KW_IN},
+        {"local",   TokenId::TOKEN_KW_LOCAL},
+        {"nil",     TokenId::TOKEN_KW_NIL},
+        {"not",     TokenId::TOKEN_OP_NOT},
+        {"or",      TokenId::TOKEN_OP_OR},
+        {"repeat",  TokenId::TOKEN_KW_REPEAT},
+        {"return",  TokenId::TOKEN_KW_RETURN},
+        {"then",    TokenId::TOKEN_KW_THEN},
+        {"true",    TokenId::TOKEN_KW_TRUE},
+        {"until",   TokenId::TOKEN_KW_UNTIL},
+        {"while",   TokenId::TOKEN_KW_WHILE},
+};
+
+#endif //LUA5_3_COMPILER_TOKEN_HPP
