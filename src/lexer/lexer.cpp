@@ -9,21 +9,57 @@
   */
 
 #include <lexer/lexer.hpp>
-#include <utility>
 
 Lexer::Lexer(std::string chunk, std::string chunkName) {
-    _chunk = chunk;
-    _chunkName = chunk;
-    _line = 1;
+    m_chunk = chunk;
+    m_chunkName = chunk;
+    m_line = 1;
 }
 
 Token Lexer::NextToken() {
 
-    return Token{.line = this->_line};
+    return Token{.line = m_line};
 }
 
 void Lexer::SkipBlankSpaces() {
-    while(_chunk.length() > 0) {
-        
+    while(!m_chunk.empty()) {
+        if(Test("--")) {
+            SkipComment();
+        }
+        else if(Test("\r\n") || Test("\n\r")) {
+            Next(2);
+            m_line += 1;
+        }
+        else if(IsNewLine(m_chunk[0])) {
+            Next(1);
+            m_line += 1;
+        }
+        else if(IsWhiteSpace(m_chunk[0])) {
+            Next(1);
+        }
+        else {
+            break;
+        }
     }
 }
+
+bool Lexer::Test(const std::string& prefix) const {
+    return m_chunk.compare(0, prefix.size(), prefix) == 0;
+}
+
+void Lexer::Next(int n) {
+
+}
+
+void Lexer::SkipComment() {
+
+}
+
+bool Lexer::IsNewLine(char chr) const {
+    return false;
+}
+
+bool Lexer::IsWhiteSpace(char chr) const {
+    return false;
+}
+

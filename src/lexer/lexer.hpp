@@ -17,15 +17,23 @@
 
 class Lexer {
 private:
-    std::string _chunk;
-    std::string _chunkName;
-    int         _line;
+    std::string m_chunk;
+    std::string m_chunkName;
+    int         m_line;
+
+    void SkipBlankSpaces();
+    bool Test(const std::string& prefix) const;
+    void Next(int n);
+    void SkipComment();
+    bool IsNewLine(char chr) const;
+    bool IsWhiteSpace(char chr) const;
 
 public:
     Lexer(std::string chunk, std::string chunkName);
 
     Token NextToken();
-    void SkipBlankSpaces();
+
+
 };
 
 #endif //LUA5_3_COMPILER_LEXER_HPP
