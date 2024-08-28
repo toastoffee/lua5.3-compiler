@@ -85,8 +85,8 @@ enum class TokenId : u8 {
 };
 
 struct Token {
-    TokenId id;
-    int line;
+    int         line;
+    TokenId     id;
     std::string tokenStr;
 };
 

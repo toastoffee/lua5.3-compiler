@@ -19,14 +19,15 @@ class Lexer {
 private:
     std::string m_chunk;
     std::string m_chunkName;
+    int         m_chunkScanPos;
     int         m_line;
 
     void SkipBlankSpaces();
     bool Test(const std::string& prefix) const;
     void Next(int n);
     void SkipComment();
-    bool IsNewLine(char chr) const;
-    bool IsWhiteSpace(char chr) const;
+    static bool IsNewLine(char chr) ;
+    static bool IsWhiteSpace(char chr) ;
 
 public:
     Lexer(std::string chunk, std::string chunkName);
