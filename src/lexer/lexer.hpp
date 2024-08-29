@@ -31,8 +31,8 @@ private:
     std::string scanLongString();
     std::string scanShortString();
 
+    static std::string processNewLine(std::string s);
     static std::string findOpeningLongBracket(std::string s);
-
     static bool isNewLine(char c);
     static bool isWhiteSpace(char c);
     static bool isDigit(char c);

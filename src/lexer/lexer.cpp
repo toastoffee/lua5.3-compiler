@@ -9,6 +9,7 @@
   */
 
 #include <lexer/lexer.hpp>
+#include <regex>
 
 Lexer::Lexer(std::string chunk, std::string chunkName) {
     m_chunk = chunk;
@@ -190,7 +191,12 @@ std::string Lexer::scanLongString() {
     closingLongBracket[0] = ']';
     closingLongBracket[closingLongBracket.size()-1] = ']';
 
-    int closingLongBracketIdx = 
+    int closingLongBracketIdx = unscannedChunk().find(closingLongBracket);
+    assert(closingLongBracketIdx >= 0 && "unfinished long string or comment");
+
+    std::string str = unscannedChunk().substr(openingLongBracket.size(), closingLongBracketIdx);
+    next(closingLongBracketIdx + closingLongBracket.size());
+
 
 
 }
@@ -224,5 +230,9 @@ std::string Lexer::findOpeningLongBracket(std::string s) {
         }
     }
     return matchLen > 0 ? s.substr(matchLen) : "";
+}
+
+std::string Lexer::processNewLine(std::string s) {
+
 }
 
