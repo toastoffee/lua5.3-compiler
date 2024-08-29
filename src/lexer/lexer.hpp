@@ -22,14 +22,17 @@ private:
     int         m_chunkScanPos;
     int         m_line;
 
-    int  unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
+    inline std::string unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
+    inline int  unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
     void skipBlankSpaces();
     bool test(const std::string& prefix) const;
     void next(int n);
     void skipComment();
     std::string scanLongString();
     std::string scanShortString();
-    static bool isLongStringLeftBracket(std::string s);
+
+    static std::string findOpeningLongBracket(std::string s);
+
     static bool isNewLine(char c);
     static bool isWhiteSpace(char c);
     static bool isDigit(char c);

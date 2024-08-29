@@ -149,11 +149,9 @@ void Lexer::skipComment() {
     next(2);    // skip "--"
     if(test("[")) {     // long comment ?
         // find the right bracket
-        while(unscannedSize() > 0 && !test("]")) {
-            next(1);
-        }
-        if(unscannedSize() > 0) {
-            next(1);
+        if(!findOpeningLongBracket(unscannedChunk()).empty()) {
+            scanLongString();
+            return;
         }
     }
     // short comment
@@ -185,30 +183,46 @@ bool Lexer::isDigit(char c) {
 }
 
 std::string Lexer::scanLongString() {
-    return std::string();
+    std::string openingLongBracket = findOpeningLongBracket(unscannedChunk());
+    assert(!openingLongBracket.empty() && "invalid long string delimiter");
+
+    std::string closingLongBracket = openingLongBracket;
+    closingLongBracket[0] = ']';
+    closingLongBracket[closingLongBracket.size()-1] = ']';
+
+    int closingLongBracketIdx = 
+
+
 }
 
 std::string Lexer::scanShortString() {
     return std::string();
 }
 
-bool Lexer::isLongStringLeftBracket(std::string s) {
+std::string Lexer::findOpeningLongBracket(std::string s) {
+    int matchLen = 0;
     for (int i = 0; i < s.size(); ++i) {
         if(i == 0) {
             if(s[i] != '[') {
+                matchLen = 0;
                 break;
+            } else {
+                matchLen++;
             }
         }
         else {
             if(s[i] == ']') {
-                return true;
+                matchLen++;
+                break;
             } else if(s[i] == '=') {
+                matchLen++;
                 continue;
             } else {
+                matchLen = 0;
                 break;
             }
         }
     }
-    return false;
+    return matchLen > 0 ? s.substr(matchLen) : "";
 }
 
