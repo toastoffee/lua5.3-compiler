@@ -14,6 +14,7 @@
 #define LUA5_3_COMPILER_LEXER_HPP
 
 #include <lexer/token.hpp>
+#include <regex>
 
 class Lexer {
 private:
@@ -21,6 +22,12 @@ private:
     std::string m_chunkName;
     int         m_chunkScanPos;
     int         m_line;
+
+    const static std::regex  s_regexNewLine;
+    const static std::regex  s_regexShortStr;
+    const static std::regex  s_regexDecEscapeSeq;
+
+
 
     inline std::string unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
     inline int  unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
@@ -31,8 +38,8 @@ private:
     std::string scanLongString();
     std::string scanShortString();
 
-    static std::string processNewLine(std::string s);
     static std::string findOpeningLongBracket(std::string s);
+    static std::string escape(std::string s);
     static bool isNewLine(char c);
     static bool isWhiteSpace(char c);
     static bool isDigit(char c);
@@ -43,7 +50,11 @@ public:
 
     Token NextToken();
 
-
 };
+
+const std::regex Lexer::s_regexNewLine("\r\n|\n\r|\n|\r");
+const std::regex Lexer::s_regexShortStr("(?s)(^'(\\\\\\\\|\\\\’|\\\\\\n|\\\\z\\s*|[^’\\n])*’)|(^\"(\\\\\\\\|\\\\\"|\\\\\\n|\\\\z\\s*|[^\"\\n])*\")");
+const std::regex Lexer::s_regexDecEscapeSeq("");
+
 
 #endif //LUA5_3_COMPILER_LEXER_HPP
