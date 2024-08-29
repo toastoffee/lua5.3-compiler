@@ -22,12 +22,18 @@ private:
     int         m_chunkScanPos;
     int         m_line;
 
-    void SkipBlankSpaces();
-    bool Test(const std::string& prefix) const;
-    void Next(int n);
-    void SkipComment();
-    static bool IsNewLine(char chr) ;
-    static bool IsWhiteSpace(char chr) ;
+    int  unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
+    void skipBlankSpaces();
+    bool test(const std::string& prefix) const;
+    void next(int n);
+    void skipComment();
+    std::string scanLongString();
+    std::string scanShortString();
+    static bool isLongStringLeftBracket(std::string s);
+    static bool isNewLine(char c);
+    static bool isWhiteSpace(char c);
+    static bool isDigit(char c);
+
 
 public:
     Lexer(std::string chunk, std::string chunkName);

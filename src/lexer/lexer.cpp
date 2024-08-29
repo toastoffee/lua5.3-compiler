@@ -18,86 +18,118 @@ Lexer::Lexer(std::string chunk, std::string chunkName) {
 }
 
 Token Lexer::NextToken() {
-    SkipBlankSpaces();
-    if(m_chunk.size() == m_chunkScanPos) {
+    skipBlankSpaces();
+    if(unscannedSize() == 0) {
         return Token {.line = m_line, .id = TokenId::TOKEN_EOF, .tokenStr="EOF"};
     }
 
     switch(m_chunk[m_chunkScanPos]) {
         case ';':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_SEMI, .tokenStr=";"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_SEMI, .tokenStr=";"};
         case ',':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_COMMA, .tokenStr=","};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_COMMA, .tokenStr=","};
         case '(':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_LPAREN, .tokenStr="("};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_LPAREN, .tokenStr="("};
         case ')':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_RPAREN, .tokenStr=")"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_RPAREN, .tokenStr=")"};
         case ']':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_RBRACK, .tokenStr="]"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_RBRACK, .tokenStr="]"};
         case '{':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_LCURLY, .tokenStr="{"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_LCURLY, .tokenStr="{"};
         case '}':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_RCURLY, .tokenStr="}"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_RCURLY, .tokenStr="}"};
         case '+':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_ADD, .tokenStr="+"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_ADD, .tokenStr="+"};
         case '-':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_MINUS, .tokenStr="-"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_MINUS, .tokenStr="-"};
         case '*':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_MUL, .tokenStr="*"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_MUL, .tokenStr="*"};
         case '^':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_POW, .tokenStr="^"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_POW, .tokenStr="^"};
         case '%':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_MOD, .tokenStr="%"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_MOD, .tokenStr="%"};
         case '&':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_BAND, .tokenStr="&"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_BAND, .tokenStr="&"};
         case '|':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_BOR, .tokenStr="|"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_BOR, .tokenStr="|"};
         case '#':
-            Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_LEN, .tokenStr="#"};
+            next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_LEN, .tokenStr="#"};
         case ':':
-            if(Test("::")) {
-                Next(2); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_LABEL, .tokenStr="::"};
+            if (test("::")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_SEP_LABEL, .tokenStr="::"};
             } else {
-                Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_SEP_COLON, .tokenStr=":"};
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_COLON, .tokenStr=":"};
             }
         case '/':
-            if(Test("//")) {
-                Next(2); return Token {.line = m_line, .id = TokenId::TOKEN_OP_IDIV, .tokenStr="//"};
+            if (test("//")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_IDIV, .tokenStr="//"};
             } else {
-                Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_DIV, .tokenStr="/"};
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_DIV, .tokenStr="/"};
             }
         case '~':
-            if(Test("~=")) {
-                Next(2); return Token {.line = m_line, .id = TokenId::TOKEN_OP_NE, .tokenStr="~="};
+            if (test("~=")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_NE, .tokenStr="~="};
             } else {
-                Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_WAVE, .tokenStr="~"};
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_WAVE, .tokenStr="~"};
             }
         case '=':
-            if(Test("==")) {
-                Next(2); return Token {.line = m_line, .id = TokenId::TOKEN_OP_EQ, .tokenStr="=="};
+            if (test("==")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_EQ, .tokenStr="=="};
             } else {
-                Next(1); return Token {.line = m_line, .id = TokenId::TOKEN_OP_ASSIGN, .tokenStr="="};
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_ASSIGN, .tokenStr="="};
             }
-
-
+        case '<':
+            if (test("<<")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_SHL, .tokenStr="<<"};
+            } else if(test("<=")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_LE, .tokenStr="<="};
+            } else {
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_LT, .tokenStr="<"};
+            }
+        case '>':
+            if (test(">>")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_SHR, .tokenStr=">>"};
+            } else if(test(">=")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_GE, .tokenStr=">="};
+            } else {
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_OP_GT, .tokenStr=">"};
+            }
+        case '.':
+            if (test("...")) {
+                next(3); return {.line = m_line, .id = TokenId::TOKEN_VARARG, .tokenStr="..."};
+            } else if (test("..")) {
+                next(2); return {.line = m_line, .id = TokenId::TOKEN_OP_CONCAT, .tokenStr=".."};
+            } else if (unscannedSize() == 1 || !isDigit(m_chunk[m_chunkScanPos+1])) {
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_DOT, .tokenStr="."};
+            }
+        case '[':
+            if (test("[[") || test("[=")) {
+                return {.line = m_line, .id = TokenId::TOKEN_STRING, .tokenStr=scanLongString()};
+            } else {
+                next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_LBRACK, .tokenStr="["};
+            }
+        case '\'':
+        case '"':
+            return {.line = m_line, .id = TokenId::TOKEN_STRING, .tokenStr=scanShortString()};
+            
     }
 }
 
-void Lexer::SkipBlankSpaces() {
-    while(m_chunk.size() > m_chunkScanPos) {
-        if(Test("--")) {
-            SkipComment();
+void Lexer::skipBlankSpaces() {
+    while(unscannedSize() > 0) {
+        if(test("--")) {
+            skipComment();
         }
-        else if(Test("\r\n") || Test("\n\r")) {
-            Next(2);
+        else if(test("\r\n") || test("\n\r")) {
+            next(2);
             m_line += 1;
         }
-        else if(IsNewLine(m_chunk[m_chunkScanPos])) {
-            Next(1);
+        else if(isNewLine(m_chunk[m_chunkScanPos])) {
+            next(1);
             m_line += 1;
         }
-        else if(IsWhiteSpace(m_chunk[m_chunkScanPos])) {
-            Next(1);
+        else if(isWhiteSpace(m_chunk[m_chunkScanPos])) {
+            next(1);
         }
         else {
             break;
@@ -105,37 +137,37 @@ void Lexer::SkipBlankSpaces() {
     }
 }
 
-bool Lexer::Test(const std::string& prefix) const {
+bool Lexer::test(const std::string& prefix) const {
     return m_chunk.compare(m_chunkScanPos, prefix.size(), prefix) == 0;
 }
 
-void Lexer::Next(int n) {
+void Lexer::next(int n) {
     m_chunkScanPos += n;
 }
 
-void Lexer::SkipComment() {
-    Next(2);    // skip "--"
-    if(Test("[")) {     // long comment ?
+void Lexer::skipComment() {
+    next(2);    // skip "--"
+    if(test("[")) {     // long comment ?
         // find the right bracket
-        while(m_chunk.size() > m_chunkScanPos && !Test("]")) {
-            Next(1);
+        while(unscannedSize() > 0 && !test("]")) {
+            next(1);
         }
-        if(m_chunk.size() > m_chunkScanPos) {
-            Next(1);
+        if(unscannedSize() > 0) {
+            next(1);
         }
     }
     // short comment
-    while(m_chunk.size() > m_chunkScanPos && !IsNewLine(m_chunk[m_chunkScanPos])) {
-        Next(1);
+    while(unscannedSize() > 0 && !isNewLine(m_chunk[m_chunkScanPos])) {
+        next(1);
     }
 }
 
-bool Lexer::IsNewLine(char chr) {
-    return chr == '\r' || chr == '\n';
+bool Lexer::isNewLine(char c) {
+    return c == '\r' || c == '\n';
 }
 
-bool Lexer::IsWhiteSpace(char chr) {
-    switch (chr) {
+bool Lexer::isWhiteSpace(char c) {
+    switch (c) {
         case '\t':
         case '\n':
         case '\v':
@@ -146,5 +178,37 @@ bool Lexer::IsWhiteSpace(char chr) {
         default:
             return false;
     }
+}
+
+bool Lexer::isDigit(char c) {
+    return false;
+}
+
+std::string Lexer::scanLongString() {
+    return std::string();
+}
+
+std::string Lexer::scanShortString() {
+    return std::string();
+}
+
+bool Lexer::isLongStringLeftBracket(std::string s) {
+    for (int i = 0; i < s.size(); ++i) {
+        if(i == 0) {
+            if(s[i] != '[') {
+                break;
+            }
+        }
+        else {
+            if(s[i] == ']') {
+                return true;
+            } else if(s[i] == '=') {
+                continue;
+            } else {
+                break;
+            }
+        }
+    }
+    return false;
 }
 
