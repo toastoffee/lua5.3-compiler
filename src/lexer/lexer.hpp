@@ -26,7 +26,8 @@ private:
     const static std::regex  s_regexNewLine;
     const static std::regex  s_regexShortStr;
     const static std::regex  s_regexDecEscapeSeq;
-
+    const static std::regex  s_regexHexEscapeSeq;
+    const static std::regex  s_regexUnicodeEscapeSeq;
 
 
     inline std::string unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
@@ -54,7 +55,9 @@ public:
 
 const std::regex Lexer::s_regexNewLine("\r\n|\n\r|\n|\r");
 const std::regex Lexer::s_regexShortStr("(?s)(^'(\\\\\\\\|\\\\’|\\\\\\n|\\\\z\\s*|[^’\\n])*’)|(^\"(\\\\\\\\|\\\\\"|\\\\\\n|\\\\z\\s*|[^\"\\n])*\")");
-const std::regex Lexer::s_regexDecEscapeSeq("");
+const std::regex Lexer::s_regexDecEscapeSeq("^\\\\[0-9]{1,3}");
+const std::regex Lexer::s_regexHexEscapeSeq("^\\\\x[0-9a-fA-F]{2}");
+const std::regex Lexer::s_regexUnicodeEscapeSeq("^\\\\u\\{[0-9a-fA-F]+\\}");
 
 
 #endif //LUA5_3_COMPILER_LEXER_HPP

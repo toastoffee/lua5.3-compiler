@@ -316,10 +316,32 @@ std::string Lexer::escape(std::string s) {
                 }
                 continue;
             case 'x': // ... \xXX
+                if(std::regex_match(s, matches, s_regexHexEscapeSeq)) {
+                    auto hexStr = '0' + matches[0].str().substr(1);
+                    int d = std::stoi(hexStr, nullptr, 16);
+                    ret += (char)d;
+                    s = s.substr(matches[0].str().size());
+                    continue;
+                }
                 continue;
             case 'u': // ... \u{XXX}
+                if(std::regex_match(s, matches, s_regexUnicodeEscapeSeq)) {
+                    auto unicodeStr = matches[0].str().substr(3, matches[0].str().size() - 1);
+                    int d = std::stoi(unicodeStr, nullptr, 16);
+
+                    if(d <= 0x10ffff) {
+                        ret += (char)d;
+                        s = s.substr(matches[0].str().size());
+                        continue;
+                    }
+                    assert(false && "UTF-8 value too large!");
+                }
                 continue;
             case 'z': // ...
+                s = s.substr(2);
+                while(!s.empty() && isWhiteSpace(s[0])) {
+                    s = s.substr(1);
+                }
                 continue;
         }
         assert(false && "invalid escape sequence!");

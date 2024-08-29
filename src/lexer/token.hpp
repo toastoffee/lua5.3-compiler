@@ -90,7 +90,7 @@ struct Token {
     std::string tokenStr;
 };
 
-std::map<std::string, TokenId> keywords {
+const static std::map<std::string, TokenId> keywords {
         {"and",     TokenId::TOKEN_OP_AND},
         {"break",   TokenId::TOKEN_KW_BREAK},
         {"do",      TokenId::TOKEN_KW_DO},
