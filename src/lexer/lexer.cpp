@@ -11,6 +11,16 @@
 #include <lexer/lexer.hpp>
 #include <iostream>
 
+std::regex Lexer::s_regexNewLine(R"(\r\n|\n\r|\n|\r)");
+std::regex Lexer::s_regexShortStr(R"(^(^'(\\\\|\\'|\\\n|\\z\s*|[^'\n])*')|(^"(\\\\|\\"|\\\n|\\z\s*|[^"\n])*")$)");
+std::regex Lexer::s_regexNumber(R"(^0[xX][0-9a-fA-F]*(\.[0-9a-fA-F]*)?([pP][+\-]?[0-9]+)?|^[0-9]*(\.[0-9]*)?([eE][+\-]?[0-9]+)?)");
+std::regex Lexer::s_regexIdentifier(R"(^[_\d\w]+)");
+
+std::regex Lexer::s_regexDecEscapeSeq(R"(^\\[0-9]{1,3})");
+std::regex Lexer::s_regexHexEscapeSeq(R"(^\\x[0-9a-fA-F]{2})");
+std::regex Lexer::s_regexUnicodeEscapeSeq(R"(^\\u\{[0-9a-fA-F]+\})");
+
+
 Lexer::Lexer(std::string chunk, std::string chunkName) :
     m_chunk(chunk),
     m_chunkName(chunkName),
@@ -24,7 +34,7 @@ Token Lexer::NextToken() {
         return Token {.line = m_line, .id = TokenId::TOKEN_EOF, .tokenStr="EOF"};
     }
 
-    switch(m_chunk[m_chunkScanPos]) {
+    switch(unscannedChunk()[0]) {
         case ';':
             next(1); return {.line = m_line, .id = TokenId::TOKEN_SEP_SEMI, .tokenStr=";"};
         case ',':
@@ -142,11 +152,11 @@ void Lexer::skipBlankSpaces() {
             next(2);
             m_line += 1;
         }
-        else if(isNewLine(m_chunk[m_chunkScanPos])) {
+        else if(isNewLine(unscannedChunk()[0])) {
             next(1);
             m_line += 1;
         }
-        else if(isWhiteSpace(m_chunk[m_chunkScanPos])) {
+        else if(isWhiteSpace(unscannedChunk()[0])) {
             next(1);
         }
         else {

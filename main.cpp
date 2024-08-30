@@ -1,8 +1,18 @@
 #include <iostream>
 
-#include <lexer/token.hpp>
+#include <lexer/lexer.hpp>
+
 
 int main() {
-//    std::cout << (unsigned int)TokenId::TOKEN_OP_UNM << std::endl;
+
+    Lexer lexer("print(\"Hello,World!\")", "");
+
+    lexer.NextToken();
+    lexer.NextToken();
+    lexer.NextToken();
+    lexer.NextToken();
+    lexer.NextToken();
+
+
     return 0;
 }

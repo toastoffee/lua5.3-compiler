@@ -23,17 +23,17 @@ private:
     int         m_chunkScanPos;
     int         m_line;
 
-    const static std::regex  s_regexNewLine;
-    const static std::regex  s_regexShortStr;
-    const static std::regex  s_regexDecEscapeSeq;
-    const static std::regex  s_regexHexEscapeSeq;
-    const static std::regex  s_regexUnicodeEscapeSeq;
-    const static std::regex  s_regexNumber;
-    const static std::regex  s_regexIdentifier;
+    static std::regex  s_regexNewLine;
+    static std::regex  s_regexShortStr;
+    static std::regex  s_regexDecEscapeSeq;
+    static std::regex  s_regexHexEscapeSeq;
+    static std::regex  s_regexUnicodeEscapeSeq;
+    static std::regex  s_regexNumber;
+    static std::regex  s_regexIdentifier;
 
 
-    inline std::string unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
-    inline int  unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
+    inline std::string  unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
+    inline int          unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
     void skipBlankSpaces();
     bool test(const std::string& prefix) const;
     void next(int n);
@@ -58,14 +58,5 @@ public:
     Token NextToken();
 
 };
-
-const std::regex Lexer::s_regexNewLine("\r\n|\n\r|\n|\r");
-const std::regex Lexer::s_regexShortStr("(?s)(^'(\\\\\\\\|\\\\’|\\\\\\n|\\\\z\\s*|[^’\\n])*’)|(^\"(\\\\\\\\|\\\\\"|\\\\\\n|\\\\z\\s*|[^\"\\n])*\")");
-const std::regex Lexer::s_regexDecEscapeSeq("^\\\\[0-9]{1,3}");
-const std::regex Lexer::s_regexHexEscapeSeq("^\\\\x[0-9a-fA-F]{2}");
-const std::regex Lexer::s_regexUnicodeEscapeSeq("^\\\\u\\{[0-9a-fA-F]+\\}");
-const std::regex Lexer::s_regexNumber("^0[xX][0-9a-fA-F]*(\\.[0-9a-fA-F]*)?([pP][+\\-]?[0-9]+)?|^[0-9]*(\\.[0-9]*)?([eE][+\\-]?[0-9]+)?");
-const std::regex Lexer::s_regexIdentifier("^[_\\d\\w]+");
-
 
 #endif //LUA5_3_COMPILER_LEXER_HPP
