@@ -119,6 +119,18 @@ Token Lexer::NextToken() {
     if(c == '.' || isDigit(c)) {
         return {.line = m_line, .id = TokenId::TOKEN_NUMBER, .tokenStr=scanNumber()};
     }
+    if(c == '_' || isAlpha(c)) {
+        auto tokenStr = scanIdentifier();
+
+        // is lua keyword:
+        if(keywords.find(tokenStr) != keywords.end()) {
+            return {.line = m_line, .id = keywords[tokenStr], .tokenStr=tokenStr};
+        } else {
+            return {.line = m_line, .id = TokenId::TOKEN_IDENTIFIER, .tokenStr=tokenStr};
+        }
+    }
+
+    assert(false && "unexpected symbol!");
 }
 
 void Lexer::skipBlankSpaces() {
@@ -366,6 +378,14 @@ std::string Lexer::scan(const std::regex& regex) {
         return matches[0].str();
     }
     assert(false && "unreachable!");
+}
+
+bool Lexer::isAlpha(char c) {
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+std::string Lexer::scanIdentifier() {
+    return scan(s_regexIdentifier);
 }
 
 
