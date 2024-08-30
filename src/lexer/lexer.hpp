@@ -28,6 +28,7 @@ private:
     const static std::regex  s_regexDecEscapeSeq;
     const static std::regex  s_regexHexEscapeSeq;
     const static std::regex  s_regexUnicodeEscapeSeq;
+    const static std::regex  s_regexNumber;
 
 
     inline std::string unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
@@ -38,6 +39,8 @@ private:
     void skipComment();
     std::string scanLongString();
     std::string scanShortString();
+    std::string scanNumber();
+    std::string scan(const std::regex& regex);
 
     static std::string findOpeningLongBracket(std::string s);
     static std::string escape(std::string s);
@@ -58,6 +61,8 @@ const std::regex Lexer::s_regexShortStr("(?s)(^'(\\\\\\\\|\\\\’|\\\\\\n|\\\\z\
 const std::regex Lexer::s_regexDecEscapeSeq("^\\\\[0-9]{1,3}");
 const std::regex Lexer::s_regexHexEscapeSeq("^\\\\x[0-9a-fA-F]{2}");
 const std::regex Lexer::s_regexUnicodeEscapeSeq("^\\\\u\\{[0-9a-fA-F]+\\}");
+const std::regex Lexer::s_regexNumber("^0[xX][0-9a-fA-F]*(\\.[0-9a-fA-F]*)?([pP][+\\-]?[0-9]+)?|^[0-9]*(\\.[0-9]*)?([eE][+\\-]?[0-9]+)?");
+
 
 
 #endif //LUA5_3_COMPILER_LEXER_HPP

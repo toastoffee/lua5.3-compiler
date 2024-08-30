@@ -112,7 +112,12 @@ Token Lexer::NextToken() {
         case '\'':
         case '"':
             return {.line = m_line, .id = TokenId::TOKEN_STRING, .tokenStr=scanShortString()};
-            
+    }
+
+    char c = unscannedChunk()[0];
+    // recognize digits
+    if(c == '.' || isDigit(c)) {
+        return {.line = m_line, .id = TokenId::TOKEN_NUMBER, .tokenStr=scanNumber()};
     }
 }
 
@@ -180,7 +185,7 @@ bool Lexer::isWhiteSpace(char c) {
 }
 
 bool Lexer::isDigit(char c) {
-    return false;
+    return c >= '0' && c <= '9';
 }
 
 std::string Lexer::scanLongString() {
@@ -348,6 +353,19 @@ std::string Lexer::escape(std::string s) {
     }
 
     return s;
+}
+
+std::string Lexer::scanNumber() {
+    return scan(s_regexNumber);
+}
+
+std::string Lexer::scan(const std::regex& regex) {
+    std::smatch matches;
+    if(std::regex_match(unscannedChunk(), matches, regex)) {
+        next(matches[0].str().size());
+        return matches[0].str();
+    }
+    assert(false && "unreachable!");
 }
 
 
