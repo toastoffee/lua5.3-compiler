@@ -12,7 +12,7 @@
 #include <iostream>
 
 std::regex Lexer::s_regexNewLine(R"(\r\n|\n\r|\n|\r)");
-std::regex Lexer::s_regexShortStr(R"(^(^'(\\\\|\\'|\\\n|\\z\s*|[^'\n])*')|(^"(\\\\|\\"|\\\n|\\z\s*|[^"\n])*")$)");
+std::regex Lexer::s_regexShortStr(R"((^'(\\\\|\\'|\\\n|\\z\s*|[^'\n])*')|(^"(\\\\|\\"|\\\n|\\z\s*|[^"\n])*"))");
 std::regex Lexer::s_regexNumber(R"(^0[xX][0-9a-fA-F]*(\.[0-9a-fA-F]*)?([pP][+\-]?[0-9]+)?|^[0-9]*(\.[0-9]*)?([eE][+\-]?[0-9]+)?)");
 std::regex Lexer::s_regexIdentifier(R"(^[_\d\w]+)");
 
@@ -221,7 +221,7 @@ std::string Lexer::scanLongString() {
     int closingLongBracketIdx = unscannedChunk().find(closingLongBracket);
     assert(closingLongBracketIdx >= 0 && "unfinished long string or comment");
 
-    std::string str = unscannedChunk().substr(openingLongBracket.size(), closingLongBracketIdx);
+    std::string str = strSect(unscannedChunk(), openingLongBracket.size(), closingLongBracketIdx);
     next(closingLongBracketIdx + closingLongBracket.size());
 
     str = std::regex_replace(str, s_regexNewLine, "\n");
@@ -240,12 +240,15 @@ std::string Lexer::scanLongString() {
 
 std::string Lexer::scanShortString() {
     std::smatch matches;
-    if(std::regex_match(unscannedChunk(), matches, s_regexShortStr)) {
+
+    auto s = unscannedChunk();
+
+    if(std::regex_search(unscannedChunk(), matches, s_regexShortStr)) {
         auto str = matches[0].str();
         next(str.size());
-        str = str.substr(1, str.size()-1);
+        str = strSect(str, 1, str.size()-1);
         if(str.find('\\') >= 0) {
-            std::regex_match(str, matches, s_regexNewLine);
+            std::regex_search(str, matches, s_regexNewLine);
             m_line += matches.size();
 
             str = escape(str);
@@ -330,7 +333,7 @@ std::string Lexer::escape(std::string s) {
             case '7':
             case '8':
             case '9':   // \ddd
-                if(std::regex_match(s, matches, s_regexDecEscapeSeq)) {
+                if(std::regex_search(s, matches, s_regexDecEscapeSeq)) {
                     auto decStr = matches[0].str().substr(1);
                     int d = std::stoi(decStr, nullptr, 10);
 
@@ -343,7 +346,7 @@ std::string Lexer::escape(std::string s) {
                 }
                 continue;
             case 'x': // ... \xXX
-                if(std::regex_match(s, matches, s_regexHexEscapeSeq)) {
+                if(std::regex_search(s, matches, s_regexHexEscapeSeq)) {
                     auto hexStr = '0' + matches[0].str().substr(1);
                     int d = std::stoi(hexStr, nullptr, 16);
                     ret += (char)d;
@@ -352,8 +355,8 @@ std::string Lexer::escape(std::string s) {
                 }
                 continue;
             case 'u': // ... \u{XXX}
-                if(std::regex_match(s, matches, s_regexUnicodeEscapeSeq)) {
-                    auto unicodeStr = matches[0].str().substr(3, matches[0].str().size() - 1);
+                if(std::regex_search(s, matches, s_regexUnicodeEscapeSeq)) {
+                    auto unicodeStr = strSect(matches[0].str(), 3, matches[0].str().size() - 1);
                     int d = std::stoi(unicodeStr, nullptr, 16);
 
                     if(d <= 0x10ffff) {
@@ -374,7 +377,7 @@ std::string Lexer::escape(std::string s) {
         assert(false && "invalid escape sequence!");
     }
 
-    return s;
+    return ret;
 }
 
 std::string Lexer::scanNumber() {
@@ -383,7 +386,9 @@ std::string Lexer::scanNumber() {
 
 std::string Lexer::scan(const std::regex& regex) {
     std::smatch matches;
-    if(std::regex_match(unscannedChunk(), matches, regex)) {
+    auto s = unscannedChunk();
+    auto c = s[0];
+    if(std::regex_search(s, matches, regex)) {
         next(matches[0].str().size());
         return matches[0].str();
     }
@@ -396,6 +401,10 @@ bool Lexer::isAlpha(char c) {
 
 std::string Lexer::scanIdentifier() {
     return scan(s_regexIdentifier);
+}
+
+std::string Lexer::strSect(const std::string& s, int start, int end) {
+    return s.substr(start, end - start);
 }
 
 

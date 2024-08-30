@@ -46,6 +46,7 @@ private:
 
     static std::string findOpeningLongBracket(std::string s);
     static std::string escape(std::string s);
+    static std::string strSect(const std::string& s, int start, int end);
     static bool isNewLine(char c);
     static bool isWhiteSpace(char c);
     static bool isDigit(char c);
