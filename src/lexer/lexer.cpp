@@ -15,6 +15,7 @@ std::regex Lexer::s_regexNewLine(R"(\r\n|\n\r|\n|\r)");
 std::regex Lexer::s_regexShortStr(R"((^'(\\\\|\\'|\\\n|\\z\s*|[^'\n])*')|(^"(\\\\|\\"|\\\n|\\z\s*|[^"\n])*"))");
 std::regex Lexer::s_regexNumber(R"(^0[xX][0-9a-fA-F]*(\.[0-9a-fA-F]*)?([pP][+\-]?[0-9]+)?|^[0-9]*(\.[0-9]*)?([eE][+\-]?[0-9]+)?)");
 std::regex Lexer::s_regexIdentifier(R"(^[_\d\w]+)");
+std::regex Lexer::s_regexOpeningLongBracket(R"(^\[=*\[)");
 
 std::regex Lexer::s_regexDecEscapeSeq(R"(^\\[0-9]{1,3})");
 std::regex Lexer::s_regexHexEscapeSeq(R"(^\\x[0-9a-fA-F]{2})");
@@ -177,7 +178,7 @@ void Lexer::skipComment() {
     next(2);    // skip "--"
     if(test("[")) {     // long comment ?
         // find the right bracket
-        if(!findOpeningLongBracket(unscannedChunk()).empty()) {
+        if(std::regex_search(unscannedChunk(), s_regexOpeningLongBracket)) {
             scanLongString();
             return;
         }

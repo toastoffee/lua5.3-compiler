@@ -25,11 +25,12 @@ private:
 
     static std::regex  s_regexNewLine;
     static std::regex  s_regexShortStr;
+    static std::regex  s_regexNumber;
+    static std::regex  s_regexIdentifier;
+    static std::regex  s_regexOpeningLongBracket;
     static std::regex  s_regexDecEscapeSeq;
     static std::regex  s_regexHexEscapeSeq;
     static std::regex  s_regexUnicodeEscapeSeq;
-    static std::regex  s_regexNumber;
-    static std::regex  s_regexIdentifier;
 
 
     inline std::string  unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
