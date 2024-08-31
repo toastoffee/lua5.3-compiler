@@ -63,8 +63,12 @@ private:
 public:
     Lexer(std::string chunk, std::string chunkName);
 
+    int GetLine() const { return m_line; }
+
     Token NextToken();
     Token LookAhead();
+    Token NextTokenOfId(TokenId id);
+    Token NextIdentifier();
 };
 
 #endif //LUA5_3_COMPILER_LEXER_HPP

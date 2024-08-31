@@ -160,6 +160,16 @@ Token Lexer::NextToken() {
     assert(false && "unexpected symbol!");
 }
 
+Token Lexer::NextTokenOfId(TokenId id) {
+    auto token = NextToken();
+    assert(token.id == id && "syntax error!");
+    return token;
+}
+
+Token Lexer::NextIdentifier() {
+    return NextTokenOfId(TokenId::TOKEN_IDENTIFIER);
+}
+
 Token Lexer::LookAhead() {
     if(m_nextToken.line > 0) {
         return m_nextToken;
