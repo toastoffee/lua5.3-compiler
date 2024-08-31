@@ -451,3 +451,45 @@ std::string Lexer::strSect(const std::string& s, int start, int end) {
     return s.substr(start, end - start);
 }
 
+
+inline std::string idToCategory(TokenId id) {
+    if(id < TokenId::TOKEN_SEP_SEMI) {
+        return "other";
+    }
+    else if(id < TokenId::TOKEN_SEP_RCURLY) {
+        return "separator";
+    }
+    else if(id < TokenId::TOKEN_OP_NOT) {
+        return "operator";
+    }
+    else if(id < TokenId::TOKEN_KW_WHILE) {
+        return "keyword";
+    }
+    else if(id < TokenId::TOKEN_IDENTIFIER) {
+        return "identifier";
+    }
+    else if(id < TokenId::TOKEN_NUMBER) {
+        return "number";
+    }
+    else if(id < TokenId::TOKEN_STRING) {
+        return "string";
+    }
+    else {
+        return "other";
+    }
+}
+
+void Lexer::TestLexer(std::string chunk, std::string chunkName) {
+    Lexer lexer(chunk, chunkName);
+
+    while(true) {
+        auto token = lexer.NextToken();
+        printf("[%02d] [%-10s] %s\n",
+               m_line, idToCategory(token.id).c_str(), token.tokenStr.c_str());
+
+        if(token.id == TokenId::TOKEN_EOF) {
+            break;
+        }
+    }
+
+}

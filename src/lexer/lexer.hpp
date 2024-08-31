@@ -69,6 +69,9 @@ public:
     Token LookAhead();
     Token NextTokenOfId(TokenId id);
     Token NextIdentifier();
+
+    void TestLexer(std::string chunk, std::string chunkName);
 };
+
 
 #endif //LUA5_3_COMPILER_LEXER_HPP
