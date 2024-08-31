@@ -70,7 +70,7 @@ public:
     Token NextTokenOfId(TokenId id);
     Token NextIdentifier();
 
-    void TestLexer(std::string chunk, std::string chunkName);
+    static void TestLexer(std::string chunk, std::string chunkName);
 };
 
 

@@ -485,7 +485,7 @@ void Lexer::TestLexer(std::string chunk, std::string chunkName) {
     while(true) {
         auto token = lexer.NextToken();
         printf("[%02d] [%-10s] %s\n",
-               m_line, idToCategory(token.id).c_str(), token.tokenStr.c_str());
+               lexer.GetLine(), idToCategory(token.id).c_str(), token.tokenStr.c_str());
 
         if(token.id == TokenId::TOKEN_EOF) {
             break;

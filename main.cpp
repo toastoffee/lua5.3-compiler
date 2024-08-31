@@ -5,24 +5,24 @@
 
 int main() {
 
-    std::string s = "print(\"Hello,World!\")";
-    Lexer lexer(s, "");
+    // load file
+    FILE* file = fopen("../lua_tests/closure.lua", "rb");
 
-    auto t1 = lexer.NextToken();
-    lexer.LookAhead();
-    auto t2 = lexer.NextToken();
-    lexer.LookAhead();
-    lexer.LookAhead();
-    auto t3 = lexer.NextToken();
-    auto t4 = lexer.NextToken();
-    auto t5 = lexer.NextToken();
+    assert(file && "failed to open file!");
 
-//    std::regex re(R"(^[_\d\w]+)");
-//    auto b = std::regex_search(s, re);
+    fseek(file, 0, SEEK_END);
+    long filesize = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* source = new char[filesize];
+    fread(source, sizeof(char), filesize, file);
+    fclose(file);
+
+    std::string sourceCode(source);
 
 
-    // abcde => 5
-    // sect(abcde, 1, 4)
+    // test lexer
+    Lexer::TestLexer(sourceCode, "max.lua");
 
     return 0;
 }
