@@ -23,6 +23,8 @@ private:
     int         m_chunkScanPos;
     int         m_line;
 
+    Token       m_nextToken;
+
     static std::regex  s_regexNewLine;
     static std::regex  s_regexShortStr;
     static std::regex  s_regexNumber;
@@ -33,32 +35,36 @@ private:
     static std::regex  s_regexUnicodeEscapeSeq;
 
 
-    inline std::string  unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
-    inline int          unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
-    void skipBlankSpaces();
-    bool test(const std::string& prefix) const;
-    void next(int n);
-    void skipComment();
-    std::string scanLongString();
-    std::string scanShortString();
-    std::string scanNumber();
-    std::string scanIdentifier();
-    std::string scan(const std::regex& regex);
+    inline std::string unscannedChunk() const { return m_chunk.substr(m_chunkScanPos); };
+    inline int         unscannedSize() const { return m_chunk.size() - m_chunkScanPos; }
+
+    bool               test(const std::string& prefix) const;
+    void               next(int n);
+
+    void               skipComment();
+    void               skipBlankSpaces();
+
+    std::string        scanLongString();
+    std::string        scanShortString();
+    std::string        scanNumber();
+    std::string        scanIdentifier();
+    std::string        scan(const std::regex& regex);
 
     static std::string findOpeningLongBracket(std::string s);
     static std::string escape(std::string s);
     static std::string strSect(const std::string& s, int start, int end);
-    static bool isNewLine(char c);
-    static bool isWhiteSpace(char c);
-    static bool isDigit(char c);
-    static bool isAlpha(char c);
+
+    static bool        isNewLine(char c);
+    static bool        isWhiteSpace(char c);
+    static bool        isDigit(char c);
+    static bool        isAlpha(char c);
 
 
 public:
     Lexer(std::string chunk, std::string chunkName);
 
     Token NextToken();
-
+    Token LookAhead();
 };
 
 #endif //LUA5_3_COMPILER_LEXER_HPP

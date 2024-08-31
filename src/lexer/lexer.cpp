@@ -26,10 +26,26 @@ Lexer::Lexer(std::string chunk, std::string chunkName) :
     m_chunk(chunk),
     m_chunkName(chunkName),
     m_chunkScanPos(0),
-    m_line(1) { }
+    m_line(1),
+    m_nextToken({.line = 0, .id = TokenId::TOKEN_EOF, .tokenStr = ""})
+    { }
 
 
 Token Lexer::NextToken() {
+
+    // is next token is recorded, then read it and clear it
+    if(m_nextToken.line > 0) {
+
+        // set the line status as the next token
+        m_line = m_nextToken.line;
+
+        // clear the next token
+        m_nextToken.line = 0;
+
+        // return next token
+        return m_nextToken;
+    }
+
     skipBlankSpaces();
     if(unscannedSize() == 0) {
         return Token {.line = m_line, .id = TokenId::TOKEN_EOF, .tokenStr="EOF"};
@@ -142,6 +158,23 @@ Token Lexer::NextToken() {
     }
 
     assert(false && "unexpected symbol!");
+}
+
+Token Lexer::LookAhead() {
+    if(m_nextToken.line > 0) {
+        return m_nextToken;
+    }
+
+    // record current stat, (DON'T RESET THE SCAN POS)
+    int currentLine = m_line;
+
+    // get next token
+    m_nextToken = NextToken();
+
+    // reset the stat as before
+    m_line = currentLine;
+
+    return m_nextToken;
 }
 
 void Lexer::skipBlankSpaces() {
@@ -407,5 +440,4 @@ std::string Lexer::scanIdentifier() {
 std::string Lexer::strSect(const std::string& s, int start, int end) {
     return s.substr(start, end - start);
 }
-
 

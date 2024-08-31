@@ -9,7 +9,10 @@ int main() {
     Lexer lexer(s, "");
 
     auto t1 = lexer.NextToken();
+    lexer.LookAhead();
     auto t2 = lexer.NextToken();
+    lexer.LookAhead();
+    lexer.LookAhead();
     auto t3 = lexer.NextToken();
     auto t4 = lexer.NextToken();
     auto t5 = lexer.NextToken();
