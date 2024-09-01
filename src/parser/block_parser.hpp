@@ -13,6 +13,12 @@
 #ifndef LUA5_3_COMPILER_BLOCK_PARSER_HPP
 #define LUA5_3_COMPILER_BLOCK_PARSER_HPP
 
+// chunk := block
+// block := {stat} [retstat]    ( {}:any times, []:0 or 1 time )
+// retstat := return [explist] [';']
+// explist := exp {',' exp }
+
+
 
 class block_parser {
 
