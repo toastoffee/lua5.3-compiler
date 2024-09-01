@@ -11,4 +11,7 @@ add_executable(lua5_3_compiler main.cpp
         src/lexer/token.hpp
         src/lexer/lexer.hpp
         src/lexer/lexer.cpp
+        src/parser/block.hpp
+        src/parser/block_parser.cpp
+        src/parser/block_parser.hpp
 )
