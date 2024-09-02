@@ -10,17 +10,17 @@
 
 
 
-#ifndef LUA5_3_COMPILER_PARSER_NODES_HPP
-#define LUA5_3_COMPILER_PARSER_NODES_HPP
+#ifndef LUA5_3_COMPILER_AST_NODES_HPP
+#define LUA5_3_COMPILER_AST_NODES_HPP
 
 #include <string>
 #include <vector>
 
+#include <types.hpp>
+
 struct Block;
 struct Statement;
 struct Expression;
-
-
 
 struct Block {
     int lastLine;
@@ -30,7 +30,7 @@ struct Block {
 
 struct Statement {};
 
-struct Expression { };
+struct Expression {};
 
 //! simple statements
 struct EmptyStatement : Statement {};   // ';'
@@ -132,4 +132,105 @@ struct LocalFuncDefStatement : Statement {
 };
 
 
-#endif //LUA5_3_COMPILER_PARSER_NODES_HPP
+//! simple expressions
+// exp ::=  nil | false | true | Numeral | LiteralString | '...'
+//           | functiondef | prefixexp | tableconstructor
+//           | exp binop exp | unop exp
+struct NilExpression : Expression {
+    int line;
+};
+
+struct TrueExpression : Expression {
+    int line;
+};
+
+struct FalseExpression : Expression {
+    int line;
+};
+
+struct VarargExpression : Expression {
+    int line;
+};
+
+struct IntegerExpression : Expression {
+    int line;
+    i64 val;
+};
+
+struct FloatExpression : Expression {
+    int line;
+    f64 val;
+};
+
+struct StringExpression : Expression {
+    int line;
+    std::string str;
+};
+
+struct NameExpression : Expression {
+    int line;
+    std::string name;
+};
+
+//! un-op & bin-op algorithm expressions
+struct unopExpression : Expression {
+    int line;   // line of operator
+    int op;     // operator
+    Expression exp;
+};
+
+struct BinopExpression : Expression {
+    int line;
+    int op;
+    Expression expL;
+    Expression expR;
+};
+
+struct ConcatExpression : Expression {
+    int line;
+    std::vector<Expression> exps;
+};
+
+//! table constructor expressions
+// tableconstructor ::= '{' [fieldlist] '}'
+// fieldlist ::= field {fieldsep field} [fieldsep]
+// field ::= '[' exp ']' '=' exp | Name '=' exp | exp
+// fieldsep ::= ',' | ';”
+struct TableConstructorExpression : Expression {
+    int line;       // line of "{"
+    int lastLine;   // line of "}"
+    std::vector<Expression> keyExpressions;
+    std::vector<Expression> valExpressions;
+};
+
+//! function definition expressions
+// functiondef ::= function funcbody
+// funcbody ::= '(' [parlist] ')' block end
+// parlist ::= namelist [',' '...'] | '...'
+// namelist ::= Name {',' Name}
+struct FuncDefExpression : Expression {
+    int line;
+    int lastLine;
+    std::vector<std::string> parList;
+    bool isVararg;
+    Block *block;
+};
+
+//! prefix expressions
+// prefixexp ::= var | functioncall | '(' exp ')'
+// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name
+// functioncall ::=  prefixexp args | prefixexp ':' Name args
+
+// prefixexp ::= Name
+//           | '(' exp ')'
+//           | prefixexp '[' exp ']'
+//           | prefixexp '.' Name
+//           | prefixexp [':' Name] args
+
+
+//! Paren expressions
+struct ParensExpression {
+    Expression exp;
+};
+
+#endif //LUA5_3_COMPILER_AST_NODES_HPP

@@ -15,5 +15,5 @@ add_executable(lua5_3_compiler main.cpp
         src/parser/block_parser.hpp
         src/parser/statement_parser.cpp
         src/parser/statement_parser.hpp
-        src/parser/parser_nodes.hpp
+        src/parser/ast_nodes.hpp
 )
