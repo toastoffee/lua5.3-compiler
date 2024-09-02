@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <lexer/lexer.hpp>
-
+#include <parser/ast_nodes.hpp>
 
 int main() {
 
@@ -23,6 +23,13 @@ int main() {
 
     // test lexer
     Lexer::TestLexer(sourceCode, "max.lua");
+
+
+    // test type tool
+
+    Statement stat = EmptyStatement();
+
+    bool a = TypeTool::IsInstanceOf(stat, typeid(EmptyStatement));
 
     return 0;
 }

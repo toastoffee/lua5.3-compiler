@@ -32,5 +32,13 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 
+class TypeTool {
+public:
+
+    template<typename T>
+    static bool IsInstanceOf(const T& t, const std::type_info& type) {
+        return typeid(t) == type;
+    }
+};
 
 #endif //LUA5_3_COMPILER_TYPES_HPP

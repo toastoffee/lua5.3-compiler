@@ -24,6 +24,10 @@ struct Block;
 struct Statement;
 struct Expression;
 
+// chunk := block
+// block := {stat} [retstat]    ( {}:any times, []:0 or 1 time )
+// retstat := return [explist] [';']
+// explist := exp {',' exp }
 struct Block : Node {
     int lastLine;
     std::vector<Statement> statements;
