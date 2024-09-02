@@ -21,15 +21,15 @@
 
 class BlockParser {
 private:
-    static bool isReturnOrBlockEnd(Token token);
+    static bool isReturnOrBlockEnd(const Token& token);
 
 public:
     static Block *ParseBlock(Lexer *lexer);
 
-    static std::vector<Statement> ParseStatements(Lexer *lexer);
-    static Statement ParseStatement(Lexer *lexer);
+    static std::vector<Statement*> ParseStatements(Lexer *lexer);
+    static Statement* ParseStatement(Lexer *lexer);
 
-    static std::vector<Expression> ParseRetExpressions(Lexer *lexer);
+    static std::vector<Expression*> ParseRetExpressions(Lexer *lexer);
 
 
 };
