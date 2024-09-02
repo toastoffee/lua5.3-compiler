@@ -18,7 +18,9 @@
 
 #include <types.hpp>
 
-struct Node{ };
+struct Node{
+    virtual ~Node() = default;
+};
 
 struct Block;
 struct Statement;
@@ -30,8 +32,8 @@ struct Expression;
 // explist := exp {',' exp }
 struct Block : Node {
     int lastLine;
-    std::vector<Statement> statements;
-    std::vector<Expression> expressions;
+    std::vector<Statement*> statements;
+    std::vector<Expression*> expressions;
 };
 
 struct Statement : Node {};
@@ -42,7 +44,7 @@ struct Expression : Node {};
 struct EmptyStatement : Statement {};   // ';'
 
 struct BreakStatement : Statement {     // break
-    int line;
+    int line{};
 };
 
 struct LabelStatement : Statement {     // '::' Name '::'
@@ -54,28 +56,28 @@ struct GotoStatement : Statement {      // goto Name
 };
 
 struct DoStatement : Statement {
-    Block *block;
+    Block *block{};
 };
 
 //! while statement
 // while exp do block end
 struct WhileStatement : Statement {
-    Expression exp;
-    Block *block;
+    Expression *exp{};
+    Block *block{};
 };
 
 //! repeat statement
 // repeat block until exp
 struct RepeatStatement : Statement {
-    Block *block;
-    Expression *exp;
+    Block *block{};
+    Expression *exp{};
 };
 
 //! if statement
 // if exp then block {elseif exp then block} [else block] end
 // simplified: if exp then block {elseif exp then block} [elseif true then block] end
 struct IfStatement : Statement {
-    std::vector<Expression> exps;
+    std::vector<Expression*> exps;
     std::vector<Block*> blocks;
 };
 
@@ -85,9 +87,9 @@ struct  ForNumStatement : Statement {
     int lineOfFor;
     int lineOfDo;
     std::string varName;
-    Expression initExp;
-    Expression limitExp;
-    Expression stepExp;
+    Expression *initExp;
+    Expression *limitExp;
+    Expression *stepExp;
     Block *block;
 };
 
@@ -98,8 +100,8 @@ struct  ForNumStatement : Statement {
 struct ForInStatement : Statement {
     int lineOfDo;
     std::vector<std::string> nameList;
-    std::vector<Expression> exps;
-    Block *bloc;
+    std::vector<Expression*> exps;
+    Block *block;
 };
 
 //! local variable declaration statement
@@ -109,7 +111,7 @@ struct ForInStatement : Statement {
 struct LocalVarDeclStatement : Statement {
     int lastLine;
     std::vector<std::string> nameList;
-    std::vector<Expression>  expList;
+    std::vector<Expression*>  expList;
 };
 
 //! assignment statement
@@ -119,8 +121,8 @@ struct LocalVarDeclStatement : Statement {
 // explist ::= exp {',' exp}
 struct AssignStatement : Statement {
     int lastLine;
-    std::vector<Expression> varList;
-    std::vector<Expression> expList;
+    std::vector<Expression*> varList;
+    std::vector<Expression*> expList;
 };
 
 //! non-local function definition statement
@@ -143,29 +145,29 @@ struct LocalFuncDefStatement : Statement {
 //           | functiondef | prefixexp | tableconstructor
 //           | exp binop exp | unop exp
 struct NilExpression : Expression {
-    int line;
+    int line{};
 };
 
 struct TrueExpression : Expression {
-    int line;
+    int line{};
 };
 
 struct FalseExpression : Expression {
-    int line;
+    int line{};
 };
 
 struct VarargExpression : Expression {
-    int line;
+    int line{};
 };
 
 struct IntegerExpression : Expression {
-    int line;
-    i64 val;
+    int line{};
+    i64 val{};
 };
 
 struct FloatExpression : Expression {
-    int line;
-    f64 val;
+    int line{};
+    f64 val{};
 };
 
 struct StringExpression : Expression {
@@ -180,21 +182,21 @@ struct NameExpression : Expression {
 
 //! un-op & bin-op algorithm expressions
 struct unopExpression : Expression {
-    int line;   // line of operator
-    int op;     // operator
-    Expression exp;
+    int line{};   // line of operator
+    int op{};     // operator
+    Expression *exp{};
 };
 
 struct BinopExpression : Expression {
-    int line;
-    int op;
-    Expression expL;
-    Expression expR;
+    int line{};
+    int op{};
+    Expression *expL{};
+    Expression *expR{};
 };
 
 struct ConcatExpression : Expression {
     int line;
-    std::vector<Expression> exps;
+    std::vector<Expression*> exps;
 };
 
 //! table constructor expressions
@@ -205,8 +207,8 @@ struct ConcatExpression : Expression {
 struct TableConstructorExpression : Expression {
     int line;       // line of "{"
     int lastLine;   // line of "}"
-    std::vector<Expression> keyExpressions;
-    std::vector<Expression> valExpressions;
+    std::vector<Expression*> keyExpressions;
+    std::vector<Expression*> valExpressions;
 };
 
 //! function definition expressions
@@ -236,14 +238,14 @@ struct FuncDefExpression : Expression {
 
 //! Paren expressions
 struct ParensExpression : Expression {
-    Expression exp;
+    Expression *exp{};
 };
 
 //! table access expressions
 struct TableAccessExpression : Expression {
-    int lastLine;   // line of ']'
-    Expression prefixExpression;
-    Expression keyExpression;
+    int lastLine{};   // line of ']'
+    Expression *prefixExpression{};
+    Expression *keyExpression{};
 };
 
 //! function call expressions
@@ -252,9 +254,9 @@ struct TableAccessExpression : Expression {
 struct FuncCallExpression : Expression {
     int line;       // line of '('
     int lastLine;   // line of ')'
-    Expression prefixExp;
+    Expression *prefixExp;
     StringExpression *nameExp;
-    std::vector<Expression> args;
+    std::vector<Expression*> args;
 };
 
 #endif //LUA5_3_COMPILER_AST_NODES_HPP

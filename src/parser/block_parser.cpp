@@ -22,12 +22,12 @@ Block *BlockParser::ParseBlock(Lexer *lexer) {
 }
 
 std::vector<Statement> BlockParser::ParseStatements(Lexer *lexer) {
-    std::vector<Statement> ret;
+    std::vector<Statement> stats;
     while(!isReturnOrBlockEnd(lexer->LookAhead())) {
         auto statement = ParseStatement(lexer);
 
     }
-    return ret;
+    return stats;
 }
 
 std::vector<Expression> BlockParser::ParseRetExpressions(Lexer *lexer) {

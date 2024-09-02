@@ -24,13 +24,5 @@ int main() {
     // test lexer
     Lexer::TestLexer(sourceCode, "max.lua");
 
-
-    // test type tool
-
-    Statement stat = EmptyStatement();
-    EmptyStatement s = EmptyStatement();
-
-    bool a = IS_INSTANCE_OF(stat, EmptyStatement);
-
     return 0;
 }

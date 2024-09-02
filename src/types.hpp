@@ -32,16 +32,12 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 
-//template<typename Base>
-//class IsInstanceOf {
-//public:
-//    template<typename Derived>
-//    static bool Value(const Derived& instance) {
-//        return std::is_base_of<Derived, Base>::value;
-//    }
-//};
 
-#define IS_INSTANCE_OF(instance, ClassType) std::is_base_of<typeof(instance), ClassType>::value
+template<typename DecType, typename ValType>
+bool isInstanceOf(ValType* instance) {
+    return dynamic_cast<DecType*>(instance) != nullptr;
+}
+
 
 
 #endif //LUA5_3_COMPILER_TYPES_HPP
