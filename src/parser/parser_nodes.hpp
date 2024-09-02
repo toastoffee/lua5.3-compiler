@@ -20,49 +20,116 @@ struct Block;
 struct Statement;
 struct Expression;
 
+
+
 struct Block {
     int lastLine;
+    std::vector<Statement> statements;
+    std::vector<Expression> expressions;
 };
 
-struct Expression {
+struct Statement {};
 
-};
+struct Expression { };
 
-struct EmptyStatement {};   // ';'
+//! simple statements
+struct EmptyStatement : Statement {};   // ';'
 
-struct BreakStatement {     // break
+struct BreakStatement : Statement {     // break
     int line;
 };
 
-struct LabelStatement {     // '::' Name '::'
+struct LabelStatement : Statement {     // '::' Name '::'
     std::string name;
 };
 
-struct GotoStatement {      // goto Name
+struct GotoStatement : Statement {      // goto Name
     std::string name;
 };
 
-struct DoStatement {
+struct DoStatement : Statement {
     Block *block;
 };
 
+//! while statement
 // while exp do block end
-struct WhileStatement {
+struct WhileStatement : Statement {
     Expression exp;
     Block *block;
 };
 
+//! repeat statement
 // repeat block until exp
-struct RepeatStatement {
+struct RepeatStatement : Statement {
     Block *block;
     Expression *exp;
 };
 
+//! if statement
 // if exp then block {elseif exp then block} [else block] end
 // simplified: if exp then block {elseif exp then block} [elseif true then block] end
-struct IfStatement {
+struct IfStatement : Statement {
     std::vector<Expression> exps;
     std::vector<Block*> blocks;
 };
+
+//! value for-loop statement
+// for Name '=’ exp ',’ exp [',’ exp] do block end
+struct  ForNumStatement : Statement {
+    int lineOfFor;
+    int lineOfDo;
+    std::string varName;
+    Expression initExp;
+    Expression limitExp;
+    Expression stepExp;
+    Block *block;
+};
+
+//! common for-loop statement
+// for namelist in explist do block end
+// namelist ::= Name {',' Name}
+// explist ::= exp {',' exp}
+struct ForInStatement : Statement {
+    int lineOfDo;
+    std::vector<std::string> nameList;
+    std::vector<Expression> exps;
+    Block *bloc;
+};
+
+//! local variable declaration statement
+// local namelist ['=' explist]
+// namelist ::= Name {',' Name}
+// explist ::= exp {',' exp}
+struct LocalVarDeclStatement : Statement {
+    int lastLine;
+    std::vector<std::string> nameList;
+    std::vector<Expression>  expList;
+};
+
+//! assignment statement
+// varlist '=' explist
+// varlist ::= var {',' var}
+// var ::=  Name | prefixexp '[' exp ']' | prefixexp '.' Name
+// explist ::= exp {',' exp}
+struct AssignStatement : Statement {
+    int lastLine;
+    std::vector<Expression> varList;
+    std::vector<Expression> expList;
+};
+
+//! non-local function definition statement
+// function funcname funcbody
+// funcname ::= Name {'.' Name} [':' Name]
+// funcbody ::= '(' [parlist] ')' block end
+// parlist ::= namelist [',' '...'] | '...'
+// namelist ::= Name {',' Name}
+
+//! local function definition statement
+// local function Name funcbody
+struct LocalFuncDefStatement : Statement {
+    std::string name;
+    Expression *funcDefExp;
+};
+
 
 #endif //LUA5_3_COMPILER_PARSER_NODES_HPP
