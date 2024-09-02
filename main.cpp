@@ -28,8 +28,9 @@ int main() {
     // test type tool
 
     Statement stat = EmptyStatement();
+    EmptyStatement s = EmptyStatement();
 
-    bool a = TypeTool::IsInstanceOf(stat, typeid(EmptyStatement));
+    bool a = IS_INSTANCE_OF(stat, EmptyStatement);
 
     return 0;
 }
