@@ -18,19 +18,21 @@
 
 #include <types.hpp>
 
+struct Node{ };
+
 struct Block;
 struct Statement;
 struct Expression;
 
-struct Block {
+struct Block : Node {
     int lastLine;
     std::vector<Statement> statements;
     std::vector<Expression> expressions;
 };
 
-struct Statement {};
+struct Statement : Node {};
 
-struct Expression {};
+struct Expression : Node {};
 
 //! simple statements
 struct EmptyStatement : Statement {};   // ';'
@@ -229,8 +231,26 @@ struct FuncDefExpression : Expression {
 
 
 //! Paren expressions
-struct ParensExpression {
+struct ParensExpression : Expression {
     Expression exp;
+};
+
+//! table access expressions
+struct TableAccessExpression : Expression {
+    int lastLine;   // line of ']'
+    Expression prefixExpression;
+    Expression keyExpression;
+};
+
+//! function call expressions
+// functioncall ::=  prefixexp [':' Name] args
+// args ::=  '(' [explist] ')' | tableconstructor | LiteralString
+struct FuncCallExpression : Expression {
+    int line;       // line of '('
+    int lastLine;   // line of ')'
+    Expression prefixExp;
+    StringExpression *nameExp;
+    std::vector<Expression> args;
 };
 
 #endif //LUA5_3_COMPILER_AST_NODES_HPP
