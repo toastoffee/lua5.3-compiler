@@ -3,6 +3,10 @@
 #include <lexer/lexer.hpp>
 #include <parser/ast_nodes.hpp>
 
+struct A {
+    int a;
+};
+
 int main() {
 
     // load file

@@ -61,39 +61,107 @@ Statement* Parser::ParseStatement(Lexer *lexer) {
 }
 
 Statement *Parser::ParseEmptyStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_SEMI);
+    return new EmptyStatement;
 }
 
 Statement *Parser::ParseBreakStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_BREAK);
+
+    auto stat = new BreakStatement;
+    stat->line = lexer->GetLine();
+    return stat;
 }
 
 Statement *Parser::ParseLabelStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_LABEL); // ::
+    auto identifier = lexer->NextIdentifier();  // name
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_LABEL); // ::
+
+    auto stat = new LabelStatement;
+    stat->name = identifier.tokenStr;
+    return stat;
 }
 
 Statement *Parser::ParseGotoStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_GOTO);   // goto
+    auto identifier = lexer->NextIdentifier();  // name
+
+    auto stat = new GotoStatement;
+    stat->name = identifier.tokenStr;
+    return stat;
 }
 
 Statement *Parser::ParseDoStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);     // do
+    Block* block = ParseBlock(lexer);                   // block
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
+
+    auto stat = new DoStatement;
+    stat->block = block;
+    return stat;
 }
 
 Statement *Parser::ParseWhileStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_WHILE);  // while
+    Expression *exp = ParseExpression(lexer);           // exp
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);     // do
+    Block *block = ParseBlock(lexer);                   // block
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
+
+    auto stat = new WhileStatement;
+    stat->exp = exp;
+    stat->block = block;
+    return stat;
 }
 
 Statement *Parser::ParseRepeatStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_REPEAT); // repeat
+    Block *block = ParseBlock(lexer);                   // block
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_UNTIL);  // until
+    Expression *exp = ParseExpression(lexer);           // exp
+
+    auto stat = new RepeatStatement;
+    stat->block = block;
+    stat->exp = exp;
+    return stat;
 }
 
 Statement *Parser::ParseIfStatement(Lexer *lexer) {
-    return nullptr;
+    std::vector<Expression *> exps;
+    std::vector<Block *> blocks;
+
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_IF);     // if
+    exps.push_back(ParseExpression(lexer));             // exp
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_THEN);   // then
+    blocks.push_back(ParseBlock(lexer));                // block
+
+    while(lexer->LookAhead().id == TokenId::TOKEN_KW_ELSEIF) {
+        lexer->NextToken();                                 // elseif
+        exps.push_back(ParseExpression(lexer));             // exp
+        lexer->NextTokenOfId(TokenId::TOKEN_KW_THEN);   // then
+        blocks.push_back(ParseBlock(lexer));                // block
+    }
+
+    // else block => elseif true then block
+    if(lexer->LookAhead().id == TokenId::TOKEN_KW_ELSE) {
+        lexer->NextToken();                         // else
+
+        auto trueExp = new TrueExpression;          // true
+        trueExp->line = lexer->GetLine();
+        exps.push_back(trueExp);
+        blocks.push_back(ParseBlock(lexer));        // block
+    }
+
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
+    auto stat = new IfStatement;
+    stat->exps = exps;
+    stat->blocks = blocks;
+    return stat;
 }
 
 Statement *Parser::ParseForStatement(Lexer *lexer) {
-    return nullptr;
+    
 }
 
 Statement *Parser::ParseFuncDefStatement(Lexer *lexer) {
