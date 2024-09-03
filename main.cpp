@@ -4,7 +4,13 @@
 #include <parser/ast_nodes.hpp>
 
 struct A {
+    virtual ~A() = default;
     int a;
+};
+
+struct B {
+    virtual ~B() = default;
+    int b;
 };
 
 int main() {
