@@ -19,17 +19,21 @@
 
 // recursive decline parser
 
-class BlockParser {
+class Parser {
 private:
     static bool isReturnOrBlockEnd(const Token& token);
 
 public:
     static Block *ParseBlock(Lexer *lexer);
 
-    static std::vector<Statement*> ParseStatements(Lexer *lexer);
+    // statement parser
+    static std::vector<Statement *> ParseStatements(Lexer *lexer);
     static Statement* ParseStatement(Lexer *lexer);
 
-    static std::vector<Expression*> ParseRetExpressions(Lexer *lexer);
+    // expression parser
+    static std::vector<Expression *> ParseRetExpressions(Lexer *lexer);
+    static std::vector<Expression *> ParseExpressionList(Lexer *lexer);
+    static Expression* ParseExpression(Lexer *lexer);
 
 
 };
