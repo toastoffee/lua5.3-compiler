@@ -40,7 +40,7 @@ public:
     static Statement* ParseForStatement(Lexer *lexer);
     static Statement* ParseFuncDefStatement(Lexer *lexer);
     static Statement* ParseLocalAssignOrFuncDefStatement(Lexer *lexer);
-    static Statement* ParseAssignOrFuncStatement(Lexer *lexer);
+    static Statement* ParseAssignOrFuncCallStatement(Lexer *lexer);
 
     // expression parser
     static std::vector<Expression *> ParseRetExpressions(Lexer *lexer);

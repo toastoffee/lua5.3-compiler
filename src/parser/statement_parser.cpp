@@ -43,14 +43,21 @@ std::vector<Statement *> Parser::ParseStatements(Lexer *lexer) {
 }
 
 Statement* Parser::ParseStatement(Lexer *lexer) {
-    auto stat = new Statement();
-
-    if(lexer->LookAhead().id == TokenId::TOKEN_SEP_SEMI) {
-        return ParseEmptyStatement(lexer);
+    switch(lexer->LookAhead().id) {
+        case TokenId::TOKEN_SEP_SEMI:    return ParseEmptyStatement(lexer);
+        case TokenId::TOKEN_KW_BREAK:    return ParseBreakStatement(lexer);
+        case TokenId::TOKEN_SEP_LABEL:   return ParseLabelStatement(lexer);
+        case TokenId::TOKEN_KW_GOTO:     return ParseGotoStatement(lexer);
+        case TokenId::TOKEN_KW_DO:       return ParseDoStatement(lexer);
+        case TokenId::TOKEN_KW_WHILE:    return ParseWhileStatement(lexer);
+        case TokenId::TOKEN_KW_REPEAT:   return ParseRepeatStatement(lexer);
+        case TokenId::TOKEN_KW_IF:       return ParseIfStatement(lexer);
+        case TokenId::TOKEN_KW_FOR:      return ParseForStatement(lexer);
+        case TokenId::TOKEN_KW_FUNCTION: return ParseFuncDefStatement(lexer);
+        case TokenId::TOKEN_KW_LOCAL:    return ParseLocalAssignOrFuncDefStatement(lexer);
+        default:                         return ParseAssignOrFuncCallStatement(lexer);
     }
-    else if(lexer->LookAhead().id == TokenId::TOKEN_SEP_SEMI)
 
-    return stat;
 }
 
 Statement *Parser::ParseEmptyStatement(Lexer *lexer) {
@@ -97,6 +104,6 @@ Statement *Parser::ParseLocalAssignOrFuncDefStatement(Lexer *lexer) {
     return nullptr;
 }
 
-Statement *Parser::ParseAssignOrFuncStatement(Lexer *lexer) {
+Statement *Parser::ParseAssignOrFuncCallStatement(Lexer *lexer) {
     return nullptr;
 }
