@@ -31,6 +31,27 @@
     | functioncall
 */
 
+std::vector<Statement *> Parser::ParseStatements(Lexer *lexer) {
+    std::vector<Statement*> stats;
+    while(!isReturnOrBlockEnd(lexer->LookAhead())) {
+        auto statement = ParseStatement(lexer);
+        if (!isInstanceOf<EmptyStatement>(statement)) {
+            stats.push_back(statement);
+        }
+    }
+    return stats;
+}
+
+Statement* Parser::ParseStatement(Lexer *lexer) {
+    auto stat = new Statement();
+
+    if(lexer->LookAhead().id == TokenId::TOKEN_SEP_SEMI) {
+        return ParseEmptyStatement(lexer);
+    }
+    else if(lexer->LookAhead().id == TokenId::TOKEN_SEP_SEMI)
+
+    return stat;
+}
 
 Statement *Parser::ParseEmptyStatement(Lexer *lexer) {
     return nullptr;
