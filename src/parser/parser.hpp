@@ -23,8 +23,14 @@ class Parser {
 private:
     static bool isReturnOrBlockEnd(const Token& token);
 
-    static Statement* parseForNumStatement(Lexer *lexer, std::string name, int lineOfFor);
-    static Statement* parseForInStatement(Lexer *lexer, std::string name);
+    static Statement* parseForNumStatement(Lexer *lexer, std::string varName, int lineOfFor);
+    static Statement* parseForInStatement(Lexer *lexer, std::string name0);
+    static std::vector<std::string> finishNameList(Lexer *lexer, std::string name0);
+    static Statement* parseLocalFuncDefStatement(Lexer *lexer);
+    static Statement* parseLocalVarDeclStatement(Lexer *lexer);
+
+
+    static Expression* parseFuncDefExpression(Lexer *lexer);
 
 public:
     static Block *ParseBlock(Lexer *lexer);

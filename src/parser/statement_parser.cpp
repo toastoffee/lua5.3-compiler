@@ -181,10 +181,10 @@ Statement *Parser::ParseForStatement(Lexer *lexer) {
 }
 
 // for Name ‘=’ exp ‘,’ exp [‘,’ exp] do block end
-Statement *Parser::parseForNumStatement(Lexer *lexer, std::string name, int lineOfFor) {
+Statement *Parser::parseForNumStatement(Lexer *lexer, std::string varName, int lineOfFor) {
     auto stat = new ForNumStatement;
     stat->lineOfFor = lineOfFor;                            // for
-    stat->varName = name;                                   // name
+    stat->varName = varName;                                // name
 
     lexer->NextTokenOfId(TokenId::TOKEN_OP_ASSIGN);     // =
     stat->initExp = ParseExpression(lexer);                 // exp
@@ -209,16 +209,94 @@ Statement *Parser::parseForNumStatement(Lexer *lexer, std::string name, int line
     return stat;
 }
 
-Statement *Parser::parseForInStatement(Lexer *lexer, std::string name) {
-    return nullptr;
+// for namelist in explist do block end
+// namelist ::= Name {‘,’ Name}
+// explist ::= exp {‘,’ exp}
+Statement *Parser::parseForInStatement(Lexer *lexer, std::string name0) {
+    auto stat = new ForInStatement;
+
+    stat->nameList = finishNameList(lexer, name0);      // namelist
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_IN);     // in
+    stat->exps = ParseExpressionList(lexer);            // explist
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);     // do
+    stat->lineOfDo = lexer->GetLine();                  //
+    stat->block = ParseBlock(lexer);                    // block
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
+
+    return stat;
 }
 
+std::vector<std::string> Parser::finishNameList(Lexer *lexer, std::string name0) {
+    std::vector<std::string> names{name0};
+
+    while (lexer->LookAhead().id == TokenId::TOKEN_SEP_COMMA) {
+        lexer->NextToken();                                     // ,
+        names.push_back(lexer->NextIdentifier().tokenStr);      // name
+    }
+    return names;
+}
+
+/*
+http://www.lua.org/manual/5.3/manual.html#3.4.11
+
+function f() end          =>  f = function() end
+function t.a.b.c.f() end  =>  t.a.b.c.f = function() end
+function t.a.b.c:f() end  =>  t.a.b.c.f = function(self) end
+local function f() end    =>  local f; f = function() end
+
+The statement `local function f () body end`
+translates to `local f; f = function () body end`
+not to `local f = function () body end`
+(This only makes a difference when the body of the function
+ contains references to f.)
+*/
+// local function Name funcbody
 Statement *Parser::ParseFuncDefStatement(Lexer *lexer) {
-    return nullptr;
+
 }
 
+// local function Name funcbody
+// local namelist [‘=’ explist]
 Statement *Parser::ParseLocalAssignOrFuncDefStatement(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_LOCAL);
+    if(lexer->LookAhead().id == TokenId::TOKEN_KW_FUNCTION) {
+        return parseLocalFuncDefStatement(lexer);
+    } else {
+        return parseLocalVarDeclStatement(lexer);
+    }
+}
+
+// local function Name funcbody
+Statement *Parser::parseLocalFuncDefStatement(Lexer *lexer) {
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_FUNCTION);           // local function
+    auto name = lexer->NextIdentifier().tokenStr;            // name
+    Expression* funcDefExpression = parseFuncDefExpression(lexer);  // funcbody
+
+    auto stat = new LocalFuncDefStatement;
+    stat->name = name;
+    stat->funcDefExp = funcDefExpression;
+
+    return stat;
+}
+
+// local namelist [‘=’ explist]
+Statement *Parser::parseLocalVarDeclStatement(Lexer *lexer) {
+    auto name0 = lexer->NextIdentifier().tokenStr;          // local name
+    auto nameList = finishNameList(lexer, name0);    // { , name }
+
+    std::vector<Expression *> expList;
+    if(lexer->LookAhead().id == TokenId::TOKEN_OP_ASSIGN) {
+        lexer->NextToken();                         // ==
+        expList = ParseExpressionList(lexer);       // explist
+    }
+    int lastLine = lexer->GetLine();
+
+    auto stat = new LocalVarDeclStatement;
+    stat->lastLine = lastLine;
+    stat->nameList = nameList;
+    stat->expList = expList;
+
+    return stat;
 }
 
 Statement *Parser::ParseAssignOrFuncCallStatement(Lexer *lexer) {
