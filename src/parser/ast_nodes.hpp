@@ -149,33 +149,55 @@ struct FuncCallStatement : Statement {
 //           | functiondef | prefixexp | tableconstructor
 //           | exp binop exp | unop exp
 struct NilExpression : Expression {
+    NilExpression() = default;
+    explicit NilExpression(int line) : line(line) {}
+
     int line{};
 };
 
 struct TrueExpression : Expression {
+    TrueExpression() = default;
+    explicit TrueExpression(int line) : line(line) {}
+
     int line{};
 };
 
 struct FalseExpression : Expression {
+    FalseExpression() = default;
+    explicit FalseExpression(int line) : line(line) {}
+
     int line{};
 };
 
 struct VarargExpression : Expression {
+    VarargExpression() = default;
+    explicit VarargExpression(int line) : line(line) {}
+
     int line{};
 };
 
 struct IntegerExpression : Expression {
+    IntegerExpression() = default;
+    IntegerExpression(int line, i64 val) : line(line), val(val) {}
+
+
     int line{};
     i64 val{};
 };
 
 struct FloatExpression : Expression {
+    FloatExpression() = default;
+    FloatExpression(int line, f64 val) : line(line), val(val) {}
+
     int line{};
     f64 val{};
 };
 
 struct StringExpression : Expression {
-    int line;
+    StringExpression() = default;
+    StringExpression(int line, const std::string &str) : line(line), str(str) {}
+
+    int line{};
     std::string str;
 };
 

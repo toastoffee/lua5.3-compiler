@@ -228,7 +228,29 @@ Expression *Parser::parseExpression_1(Lexer *lexer) { // exp0 {'^' exp2} (right 
 }
 
 Expression *Parser::parseExpression_0(Lexer *lexer) {
-    return nullptr;
+    Token token;
+    switch (lexer->LookAhead().id) {
+        case TokenId::TOKEN_VARARG:         // ...
+            return new VarargExpression(lexer->NextToken().line);
+        case TokenId::TOKEN_KW_NIL:         // nil
+            return new NilExpression(lexer->NextToken().line);
+        case TokenId::TOKEN_KW_TRUE:        // true
+            return new TrueExpression(lexer->NextToken().line);
+        case TokenId::TOKEN_KW_FALSE:       // false
+            return new FalseExpression(lexer->NextToken().line);
+        case TokenId::TOKEN_STRING:         // literalString
+            token = lexer->NextToken();
+            return new StringExpression(token.line, token.tokenStr);
+        case TokenId::TOKEN_NUMBER:         // numeral
+            return parseNumberExpression(lexer);
+        case TokenId::TOKEN_SEP_LCURLY:     // tableConstructor
+            return parseTableConstructorExpression(lexer);
+        case TokenId::TOKEN_KW_FUNCTION:    // functionDef
+            lexer->NextToken();
+            return parseFuncDefExpression(lexer);
+        default:    // prefixExp
+            return parsePrefixExp(lexer);
+    }
 }
 
 
