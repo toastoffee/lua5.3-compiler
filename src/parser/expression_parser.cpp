@@ -49,7 +49,75 @@ std::vector<Expression *> Parser::ParseRetExpressions(Lexer *lexer) {
     }
 }
 
+/*
+exp ::=  nil | false | true | Numeral | LiteralString | ‘...’ | functiondef |
+     prefixexp | tableconstructor | exp binop exp | unop exp
+*/
+/*
+exp   ::= exp12
+exp12 ::= exp11 {or exp11}
+exp11 ::= exp10 {and exp10}
+exp10 ::= exp9 {(‘<’ | ‘>’ | ‘<=’ | ‘>=’ | ‘~=’ | ‘==’) exp9}
+exp9  ::= exp8 {‘|’ exp8}
+exp8  ::= exp7 {‘~’ exp7}
+exp7  ::= exp6 {‘&’ exp6}
+exp6  ::= exp5 {(‘<<’ | ‘>>’) exp5}
+exp5  ::= exp4 {‘..’ exp4}
+exp4  ::= exp3 {(‘+’ | ‘-’ | ‘*’ | ‘/’ | ‘//’ | ‘%’) exp3}
+exp2  ::= {(‘not’ | ‘#’ | ‘-’ | ‘~’)} exp1
+exp1  ::= exp0 {‘^’ exp2}
+exp0  ::= nil | false | true | Numeral | LiteralString
+        | ‘...’ | functiondef | prefixexp | tableconstructor
+*/
 Expression *Parser::ParseExpression(Lexer *lexer) {
+    return parseExpression_12(lexer);
+}
+
+Expression *Parser::parseExpression_12(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_11(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_10(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_9(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_8(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_7(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_6(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_5(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_4(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_3(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_2(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parseExpression_1(Lexer *lexer) {
     return nullptr;
 }
 

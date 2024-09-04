@@ -37,6 +37,19 @@ private:
     static Expression* checkVar(Lexer *lexer, Expression *exp);
     static std::pair<Expression *, bool> parseFuncName(Lexer *lexer);
 
+    static Expression* parseExpression_12(Lexer *lexer);
+    static Expression* parseExpression_11(Lexer *lexer);
+    static Expression* parseExpression_10(Lexer *lexer);
+    static Expression* parseExpression_9(Lexer *lexer);
+    static Expression* parseExpression_8(Lexer *lexer);
+    static Expression* parseExpression_7(Lexer *lexer);
+    static Expression* parseExpression_6(Lexer *lexer);
+    static Expression* parseExpression_5(Lexer *lexer);
+    static Expression* parseExpression_4(Lexer *lexer);
+    static Expression* parseExpression_3(Lexer *lexer);
+    static Expression* parseExpression_2(Lexer *lexer);
+    static Expression* parseExpression_1(Lexer *lexer);
+
 public:
     static Block *ParseBlock(Lexer *lexer);
 
