@@ -139,6 +139,9 @@ struct LocalFuncDefStatement : Statement {
     Expression *funcDefExp;
 };
 
+struct FuncCallStatement : Statement {
+    Expression *exp{};
+};
 
 //! simple expressions
 // exp ::=  nil | false | true | Numeral | LiteralString | '...'

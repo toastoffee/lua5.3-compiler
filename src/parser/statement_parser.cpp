@@ -300,5 +300,13 @@ Statement *Parser::parseLocalVarDeclStatement(Lexer *lexer) {
 }
 
 Statement *Parser::ParseAssignOrFuncCallStatement(Lexer *lexer) {
-    return nullptr;
+    Expression *prefixExp = parsePrefixExp(lexer);
+    if(isInstanceOf<FuncCallExpression>(prefixExp)) {
+        auto stat = new FuncCallStatement;
+        stat->exp = prefixExp;
+
+        return stat;
+    } else {
+        return parseAssignStatement(lexer);
+    }
 }

@@ -28,9 +28,13 @@ private:
     static std::vector<std::string> finishNameList(Lexer *lexer, std::string name0);
     static Statement* parseLocalFuncDefStatement(Lexer *lexer);
     static Statement* parseLocalVarDeclStatement(Lexer *lexer);
+    static Statement* parseAssignStatement(Lexer *lexer);
 
 
     static Expression* parseFuncDefExpression(Lexer *lexer);
+    static Expression* parsePrefixExp(Lexer *lexer);
+    static std::vector<Expression *> parseVarList(Lexer *lexer, Expression *var0);
+    static Expression* checkVar(Lexer *lexer, Expression *exp);
 
 public:
     static Block *ParseBlock(Lexer *lexer);
