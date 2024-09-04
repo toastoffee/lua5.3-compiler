@@ -17,6 +17,7 @@
 #include <vector>
 
 #include <types.hpp>
+#include <lexer/token.hpp>
 
 struct Node{
     virtual ~Node() = default;
@@ -189,13 +190,16 @@ struct NameExpression : Expression {
 //! un-op & bin-op algorithm expressions
 struct unopExpression : Expression {
     int line{};   // line of operator
-    int op{};     // operator
+    TokenId op{};     // operator
     Expression *exp{};
 };
 
 struct BinopExpression : Expression {
+    BinopExpression(int line, TokenId op, Expression *expL, Expression *expR)
+    : line(line), op(op), expL(expL), expR(expR) {}
+
     int line{};
-    int op{};
+    TokenId op{};
     Expression *expL{};
     Expression *expR{};
 };

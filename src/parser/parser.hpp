@@ -49,6 +49,7 @@ private:
     static Expression* parseExpression_3(Lexer *lexer);
     static Expression* parseExpression_2(Lexer *lexer);
     static Expression* parseExpression_1(Lexer *lexer);
+    static Expression* parseExpression_0(Lexer *lexer);
 
 public:
     static Block *ParseBlock(Lexer *lexer);

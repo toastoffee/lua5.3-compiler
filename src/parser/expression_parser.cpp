@@ -73,12 +73,17 @@ Expression *Parser::ParseExpression(Lexer *lexer) {
     return parseExpression_12(lexer);
 }
 
-Expression *Parser::parseExpression_12(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_12(Lexer *lexer) { //exp12 ::= exp11 {or exp11}
+    Expression* exp = parseExpression_11(lexer);
+    while(lexer->LookAhead().id == TokenId::TOKEN_OP_OR) {
+        Token op = lexer->NextToken();
+        exp = new BinopExpression(op.line, op.id, exp, parseExpression_10(lexer));
+    }
+    return exp;
 }
 
-Expression *Parser::parseExpression_11(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_11(Lexer *lexer) { // exp11 ::= exp10 {and exp10}
+
 }
 
 Expression *Parser::parseExpression_10(Lexer *lexer) {
@@ -117,9 +122,19 @@ Expression *Parser::parseExpression_2(Lexer *lexer) {
     return nullptr;
 }
 
-Expression *Parser::parseExpression_1(Lexer *lexer) {
+Expression *Parser::parseExpression_1(Lexer *lexer) { // exp0 {'^' exp2} (right associated)
+    auto exp = parseExpression_0(lexer);
+    if(lexer->LookAhead().id == TokenId::TOKEN_OP_POW) {
+        auto token = lexer->NextToken();
+        exp = new BinopExpression(token.line, token.id, exp, parseExpression_2(lexer));
+    }
+    return exp;
+}
+
+Expression *Parser::parseExpression_0(Lexer *lexer) {
     return nullptr;
 }
+
 
 Expression *Parser::parseFuncDefExpression(Lexer *lexer) {
     return nullptr;
