@@ -53,3 +53,50 @@ Expression *Parser::ParseExpression(Lexer *lexer) {
     return nullptr;
 }
 
+Expression *Parser::parseFuncDefExpression(Lexer *lexer) {
+    return nullptr;
+}
+
+Expression *Parser::parsePrefixExp(Lexer *lexer) {
+    return nullptr;
+}
+
+// varlist ::= var {‘,’ var}
+std::vector<Expression *> Parser::parseVarList(Lexer *lexer, Expression *var0) {
+    std::vector<Expression *> vars;
+
+    vars.push_back(checkVar(lexer, var0));                  // var
+    while(lexer->LookAhead().id == TokenId::TOKEN_SEP_COMMA) {
+        lexer->NextToken();                                      // ,
+        Expression *exp = parsePrefixExp(lexer);                 // var
+        vars.push_back(checkVar(lexer, exp));
+    }
+    return vars;
+}
+
+// var ::=  Name | prefixexp ‘[’ exp ‘]’ | prefixexp ‘.’ Name
+Expression *Parser::checkVar(Lexer *lexer, Expression *exp) {
+    if(isInstanceOf<NameExpression>(exp) || isInstanceOf<TableAccessExpression>(exp)) {
+        return exp;
+    }
+    // throw error
+    throw std::runtime_error("unreachable!");
+}
+
+// funcname ::= Name {‘.’ Name} [‘:’ Name]
+std::map<Expression *, bool> Parser::parseFuncName(Lexer *lexer) {
+    auto token = lexer->NextIdentifier();
+    Expression *exp = new NameExpression(token.line, token.tokenStr);
+
+    bool hasColon = false;
+    while(lexer->LookAhead().id == TokenId::TOKEN_SEP_DOT) {
+        lexer->NextToken();
+        token = lexer->NextIdentifier();
+
+        auto idx = new StringExpression;
+        idx->line = token.line;
+        idx->str = token.tokenStr;
+
+        exp =
+    }
+}

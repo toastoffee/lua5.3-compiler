@@ -181,6 +181,9 @@ struct StringExpression : Expression {
 struct NameExpression : Expression {
     int line;
     std::string name;
+
+    NameExpression(int line, std::string name)
+    : line(line), name(name) { }
 };
 
 //! un-op & bin-op algorithm expressions

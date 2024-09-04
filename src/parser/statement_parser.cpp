@@ -252,7 +252,9 @@ not to `local f = function () body end`
 */
 // local function Name funcbody
 Statement *Parser::ParseFuncDefStatement(Lexer *lexer) {
-
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_FUNCTION);   // function
+    auto map = parseFuncName(lexer);   // funcName
+    
 }
 
 // local function Name funcbody
@@ -307,6 +309,19 @@ Statement *Parser::ParseAssignOrFuncCallStatement(Lexer *lexer) {
 
         return stat;
     } else {
-        return parseAssignStatement(lexer);
+        return parseAssignStatement(lexer, prefixExp);
     }
+}
+
+Statement *Parser::parseAssignStatement(Lexer *lexer, Expression *var0) {
+    auto varList = parseVarList(lexer, var0);    // varList
+    lexer->NextTokenOfId(TokenId::TOKEN_OP_ASSIGN);             // =
+    auto expList = ParseExpressionList(lexer);   // expList
+    int lastLine = lexer->GetLine();
+
+    auto stat = new AssignStatement;
+    stat->lastLine = lastLine;
+    stat->varList = varList;
+    stat->expList = expList;
+    return stat;
 }

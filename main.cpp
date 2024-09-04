@@ -34,5 +34,7 @@ int main() {
     // test lexer
     Lexer::TestLexer(sourceCode, "max.lua");
 
+    std::map<int*, int> m;
+
     return 0;
 }

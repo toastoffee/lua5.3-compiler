@@ -16,6 +16,7 @@
 
 #include <parser/ast_nodes.hpp>
 #include <lexer/lexer.hpp>
+#include <map>
 
 // recursive decline parser
 
@@ -28,13 +29,14 @@ private:
     static std::vector<std::string> finishNameList(Lexer *lexer, std::string name0);
     static Statement* parseLocalFuncDefStatement(Lexer *lexer);
     static Statement* parseLocalVarDeclStatement(Lexer *lexer);
-    static Statement* parseAssignStatement(Lexer *lexer);
+    static Statement* parseAssignStatement(Lexer *lexer, Expression *var0);
 
 
     static Expression* parseFuncDefExpression(Lexer *lexer);
     static Expression* parsePrefixExp(Lexer *lexer);
     static std::vector<Expression *> parseVarList(Lexer *lexer, Expression *var0);
     static Expression* checkVar(Lexer *lexer, Expression *exp);
+    static std::map<Expression *, bool> parseFuncName(Lexer *lexer);
 
 public:
     static Block *ParseBlock(Lexer *lexer);
