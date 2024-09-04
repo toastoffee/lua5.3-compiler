@@ -83,43 +83,139 @@ Expression *Parser::parseExpression_12(Lexer *lexer) { //exp12 ::= exp11 {or exp
 }
 
 Expression *Parser::parseExpression_11(Lexer *lexer) { // exp11 ::= exp10 {and exp10}
-
+    Expression *exp = parseExpression_10(lexer);
+    while(lexer->LookAhead().id == TokenId::TOKEN_OP_AND) {
+        Token op = lexer->NextToken();
+        exp = new BinopExpression(op.line, op.id, exp, parseExpression_10(lexer));
+    }
+    return exp;
 }
 
-Expression *Parser::parseExpression_10(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_10(Lexer *lexer) { // compare
+    Expression *exp = parseExpression_9(lexer);
+    Token op;
+    while (true) {
+        switch (lexer->LookAhead().id) {
+            case TokenId::TOKEN_OP_LT:
+            case TokenId::TOKEN_OP_GT:
+            case TokenId::TOKEN_OP_NE:
+            case TokenId::TOKEN_OP_LE:
+            case TokenId::TOKEN_OP_GE:
+            case TokenId::TOKEN_OP_EQ:
+                op = lexer->NextToken();
+                exp = new BinopExpression(op.line, op.id, exp, parseExpression_9(lexer));
+                break;
+            default:
+                return exp;
+        }
+    }
 }
 
-Expression *Parser::parseExpression_9(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_9(Lexer *lexer) {  // x | y
+    Expression *exp = parseExpression_8(lexer);
+    while(lexer->LookAhead().id == TokenId::TOKEN_OP_BOR) {
+        Token op = lexer->NextToken();
+        exp = new BinopExpression(op.line, op.id, exp, parseExpression_8(lexer));
+    }
+    return exp;
 }
 
-Expression *Parser::parseExpression_8(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_8(Lexer *lexer) { // x ~ y
+    Expression *exp = parseExpression_7(lexer);
+    while(lexer->LookAhead().id == TokenId::TOKEN_OP_WAVE) {
+        Token op = lexer->NextToken();
+        exp = new BinopExpression(op.line, op.id, exp, parseExpression_7(lexer));
+    }
+    return exp;
 }
 
-Expression *Parser::parseExpression_7(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_7(Lexer *lexer) {  // x & y
+    Expression *exp = parseExpression_6(lexer);
+    while(lexer->LookAhead().id == TokenId::TOKEN_OP_BAND) {
+        Token op = lexer->NextToken();
+        exp = new BinopExpression(op.line, op.id, exp, parseExpression_6(lexer));
+    }
+    return exp;
 }
 
-Expression *Parser::parseExpression_6(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_6(Lexer *lexer) { // shift
+    Expression *exp = parseExpression_5(lexer);
+    Token op;
+    while(true) {
+        switch (lexer->LookAhead().id) {
+            case TokenId::TOKEN_OP_SHL:
+            case TokenId::TOKEN_OP_SHR:
+                op = lexer->NextToken();
+                exp = new BinopExpression(op.line, op.id, exp, parseExpression_5(lexer));
+                break;
+            default:
+                return exp;
+        }
+    }
 }
 
-Expression *Parser::parseExpression_5(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_5(Lexer *lexer) { // exp4 {`..` exp4}
+    Expression *exp = parseExpression_4(lexer);
+    if(lexer->LookAhead().id != TokenId::TOKEN_OP_CONCAT) {
+        return exp;
+    }
+
+    std::vector<Expression *> exps;
+    exps.push_back(exp);
+    int line = 0;
+    while(lexer->LookAhead().id == TokenId::TOKEN_OP_CONCAT) {
+        line = lexer->NextToken().line;
+        exps.push_back(parseExpression_4(lexer));
+    }
+    return new ConcatExpression(line, exps);
 }
 
-Expression *Parser::parseExpression_4(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_4(Lexer *lexer) { // // x +/- y
+    Expression *exp = parseExpression_3(lexer);
+    Token op;
+    while (true) {
+        switch (lexer->LookAhead().id) {
+            case TokenId::TOKEN_OP_ADD:
+            case TokenId::TOKEN_OP_MINUS:
+                op = lexer->NextToken();
+                exp = new BinopExpression(op.line, op.id, exp, parseExpression_3(lexer));
+                break;
+            default:
+                return exp;
+        }
+    }
 }
 
-Expression *Parser::parseExpression_3(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_3(Lexer *lexer) { // *, %, /, //
+    Expression *exp = parseExpression_2(lexer);
+    Token op;
+    while(true) {
+        switch (lexer->LookAhead().id) {
+            case TokenId::TOKEN_OP_MUL:
+            case TokenId::TOKEN_OP_MOD:
+            case TokenId::TOKEN_OP_DIV:
+            case TokenId::TOKEN_OP_IDIV:
+                op = lexer->NextToken();
+                exp = new BinopExpression(op.line, op.id, exp, parseExpression_2(lexer));
+                break;
+            default:
+                return exp;
+        }
+    }
 }
 
-Expression *Parser::parseExpression_2(Lexer *lexer) {
-    return nullptr;
+Expression *Parser::parseExpression_2(Lexer *lexer) { // {(`not` | `#` | `-` | `~`)} exp1
+    Token op;
+    switch (lexer->LookAhead().id) {
+        case TokenId::TOKEN_OP_UNM:
+        case TokenId::TOKEN_OP_BNOT:
+        case TokenId::TOKEN_OP_LEN:
+        case TokenId::TOKEN_OP_NOT:
+            op = lexer->NextToken();
+            auto exp = new UnopExpression(op.line, op.id, parseExpression_2(lexer));
+            return exp;
+    }
+    return parseExpression_1(lexer);
 }
 
 Expression *Parser::parseExpression_1(Lexer *lexer) { // exp0 {'^' exp2} (right associated)

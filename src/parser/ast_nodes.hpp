@@ -188,7 +188,9 @@ struct NameExpression : Expression {
 };
 
 //! un-op & bin-op algorithm expressions
-struct unopExpression : Expression {
+struct UnopExpression : Expression {
+    UnopExpression(int line, TokenId op, Expression *exp) : line(line), op(op), exp(exp) {}
+
     int line{};   // line of operator
     TokenId op{};     // operator
     Expression *exp{};
@@ -205,7 +207,10 @@ struct BinopExpression : Expression {
 };
 
 struct ConcatExpression : Expression {
-    int line;
+    ConcatExpression() {}
+    ConcatExpression(int line, const std::vector<Expression *> &exps) : line(line), exps(exps) {}
+
+    int line{};
     std::vector<Expression*> exps;
 };
 
