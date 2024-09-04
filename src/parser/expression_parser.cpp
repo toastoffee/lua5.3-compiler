@@ -84,11 +84,11 @@ Expression *Parser::checkVar(Lexer *lexer, Expression *exp) {
 }
 
 // funcname ::= Name {‘.’ Name} [‘:’ Name]
-std::map<Expression *, bool> Parser::parseFuncName(Lexer *lexer) {
+std::pair<Expression *, bool> Parser::parseFuncName(Lexer *lexer) {
     auto token = lexer->NextIdentifier();
     Expression *exp = new NameExpression(token.line, token.tokenStr);
-
     bool hasColon = false;
+
     while(lexer->LookAhead().id == TokenId::TOKEN_SEP_DOT) {
         lexer->NextToken();
         token = lexer->NextIdentifier();
@@ -97,6 +97,19 @@ std::map<Expression *, bool> Parser::parseFuncName(Lexer *lexer) {
         idx->line = token.line;
         idx->str = token.tokenStr;
 
-        exp =
+        exp = new TableAccessExpression(token.line, exp, idx);
     }
+
+    if(lexer->LookAhead().id == TokenId::TOKEN_SEP_COLON) {
+        lexer->NextToken();
+        token = lexer->NextIdentifier();
+        auto idx = new StringExpression;
+        idx->line = token.line;
+        idx->str = token.tokenStr;
+
+        exp = new TableAccessExpression(token.line, exp, idx);
+        hasColon = true;
+    }
+
+    return std::make_pair(exp, hasColon);
 }

@@ -253,8 +253,20 @@ not to `local f = function () body end`
 // local function Name funcbody
 Statement *Parser::ParseFuncDefStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_FUNCTION);   // function
-    auto map = parseFuncName(lexer);   // funcName
-    
+    auto pair = parseFuncName(lexer);  // funcName
+    auto fnExp = pair.first;
+    auto hasColon = pair.second;
+    auto *fdExp = dynamic_cast<FuncDefExpression*>(parseFuncDefExpression(lexer)); // funcBody
+
+    if(hasColon) {      // v:name(args) => v.name(self, args)
+        fdExp->parList.insert(fdExp->parList.begin(), "self");
+    }
+
+    auto stat = new AssignStatement;
+    stat->lastLine = fdExp->lastLine;
+    stat->varList = std::vector<Expression *>{fnExp};
+    stat->expList = std::vector<Expression *>{fdExp};
+    return stat;
 }
 
 // local function Name funcbody

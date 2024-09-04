@@ -249,9 +249,15 @@ struct ParensExpression : Expression {
 
 //! table access expressions
 struct TableAccessExpression : Expression {
+    TableAccessExpression() = default;
+    TableAccessExpression(int lastLine, Expression* prefixExp, Expression* keyExp)
+    : lastLine(lastLine), prefixExpression(prefixExp), keyExpression(keyExp) { }
+
     int lastLine{};   // line of ']'
     Expression *prefixExpression{};
     Expression *keyExpression{};
+
+
 };
 
 //! function call expressions
