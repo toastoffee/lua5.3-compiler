@@ -295,7 +295,32 @@ Expression *Parser::parseFuncDefExpression(Lexer *lexer) {
 }
 
 std::pair<std::vector<std::string>, bool> Parser::parseParList(Lexer *lexer) {
-    return std::vector<std::string>();
+    std::vector<std::string> names;
+    bool isVararg = false;
+    switch (lexer->LookAhead().id) {
+        case TokenId::TOKEN_SEP_RPAREN:
+            return std::make_pair(names, false);
+        case TokenId::TOKEN_VARARG:
+            lexer->NextToken();
+            return std::make_pair(names, true);
+        default:
+            break;
+    }
+    Token token = lexer->NextIdentifier();
+    names.push_back(token.tokenStr);
+
+    while(lexer->LookAhead().id == TokenId::TOKEN_SEP_COMMA) {
+        lexer->NextToken();
+        if(lexer->LookAhead().id == TokenId::TOKEN_IDENTIFIER) {
+            names.push_back(lexer->NextIdentifier().tokenStr);
+        } else {
+            lexer->NextTokenOfId(TokenId::TOKEN_VARARG);
+            isVararg = true;
+            break;
+        }
+    }
+
+    return std::make_pair(names, isVararg);
 }
 
 Expression *Parser::parsePrefixExp(Lexer *lexer) {
