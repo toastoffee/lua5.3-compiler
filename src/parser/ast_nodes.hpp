@@ -242,8 +242,15 @@ struct ConcatExpression : Expression {
 // field ::= '[' exp ']' '=' exp | Name '=' exp | exp
 // fieldsep ::= ',' | ';”
 struct TableConstructorExpression : Expression {
-    int line;       // line of "{"
-    int lastLine;   // line of "}"
+    TableConstructorExpression() = default;
+
+    TableConstructorExpression(int line, int lastLine, const std::vector<Expression *> &keyExpressions,
+                               const std::vector<Expression *> &valExpressions) :
+                               line(line), lastLine(lastLine),
+                               keyExpressions(keyExpressions), valExpressions(valExpressions) {}
+
+    int line{};       // line of "{"
+    int lastLine{};   // line of "}"
     std::vector<Expression*> keyExpressions;
     std::vector<Expression*> valExpressions;
 };

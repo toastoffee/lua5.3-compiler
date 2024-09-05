@@ -267,8 +267,71 @@ Expression *Parser::parseNumberExpression(Lexer *lexer) {
     throw std::runtime_error("not a number:" + token.tokenStr);
 }
 
+// tableconstructor ::= ‘{’ [fieldlist] ‘}’
 Expression *Parser::parseTableConstructorExpression(Lexer *lexer) {
-    return nullptr;
+    int line = lexer->GetLine();
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_LCURLY);    // {
+    auto pair = parseFieldList(lexer);             // [fieldList]
+    auto keyExps = pair.first;
+    auto valExps = pair.second;
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_RCURLY);    // }
+    auto lastLine = lexer->GetLine();
+    return new TableConstructorExpression(line, lastLine, keyExps, valExps);
+}
+
+// fieldlist ::= field {fieldsep field} [fieldsep]
+std::pair<std::vector<Expression *>, std::vector<Expression *>> Parser::parseFieldList(Lexer *lexer) {
+    std::vector<Expression *> ks, vs;
+    if(lexer->LookAhead().id != TokenId::TOKEN_SEP_RCURLY) {
+        auto pair = parseField(lexer);                          // field
+        ks.push_back(pair.first);
+        vs.push_back(pair.second);
+
+        while(isFieldSep(lexer->LookAhead().id)) {              // {
+            lexer->NextToken();                                         // fieldSep
+            if(lexer->LookAhead().id != TokenId::TOKEN_SEP_RCURLY) {
+                pair = parseField(lexer);                               // field
+                ks.push_back(pair.first);
+                vs.push_back(pair.second);
+            } else {
+                break;                                                  // [fieldSep]
+            }
+
+        }
+    }
+
+    return std::make_pair(ks, vs);
+}
+
+// field ::= ‘[’ exp ‘]’ ‘=’ exp | Name ‘=’ exp | exp
+std::pair<Expression *, Expression *> Parser::parseField(Lexer *lexer) {
+    Expression *k, *v;
+    if(lexer->LookAhead().id == TokenId::TOKEN_SEP_LBRACK) {
+        lexer->NextToken();                                     // '['
+        k = ParseExpression(lexer);                             // exp
+        lexer->NextTokenOfId(TokenId::TOKEN_SEP_RBRACK);    // ']'
+        lexer->NextTokenOfId(TokenId::TOKEN_OP_ASSIGN);     // =
+        v = ParseExpression(lexer);                             // exp
+        return std::make_pair(k, v);
+    }
+
+    auto exp = ParseExpression(lexer);
+    if(isInstanceOf<NameExpression>(exp)) {
+        if(lexer->LookAhead().id == TokenId::TOKEN_OP_ASSIGN) {
+            // Name ‘=’ exp => ‘[’ LiteralString ‘]’ = exp
+            lexer->NextToken();
+            auto nameExp = dynamic_cast<NameExpression *>(exp);
+            k = new StringExpression(nameExp->line, nameExp->name);
+            v = ParseExpression(lexer);
+            return std::make_pair(k, v);
+        }
+    }
+
+    return std::make_pair(nullptr, exp);
+}
+
+bool Parser::isFieldSep(TokenId tokenId) {
+    return tokenId == TokenId::TOKEN_SEP_COMMA || tokenId == TokenId::TOKEN_SEP_SEMI;
 }
 
 // functiondef ::= function funcbody
