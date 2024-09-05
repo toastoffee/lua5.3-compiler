@@ -253,6 +253,14 @@ Expression *Parser::parseExpression_0(Lexer *lexer) {
     }
 }
 
+Expression *Parser::parseNumberExpression(Lexer *lexer) {
+    Token token = lexer->NextToken();
+
+}
+
+Expression *Parser::parseTableConstructorExpression(Lexer *lexer) {
+    return nullptr;
+}
 
 Expression *Parser::parseFuncDefExpression(Lexer *lexer) {
     return nullptr;

@@ -23,11 +23,11 @@ Block *Parser::ParseBlock(Lexer *lexer) {
 
 bool Parser::isReturnOrBlockEnd(const Token& token) {
     if(token.id == TokenId::TOKEN_KW_RETURN
-       | token.id == TokenId::TOKEN_EOF
-       | token.id == TokenId::TOKEN_KW_END
-       | token.id == TokenId::TOKEN_KW_ELSE
-       | token.id == TokenId::TOKEN_KW_ELSEIF
-       | token.id == TokenId::TOKEN_KW_UNTIL) {
+       || token.id == TokenId::TOKEN_EOF
+       || token.id == TokenId::TOKEN_KW_END
+       || token.id == TokenId::TOKEN_KW_ELSE
+       || token.id == TokenId::TOKEN_KW_ELSEIF
+       || token.id == TokenId::TOKEN_KW_UNTIL) {
         return true;
     } else {
         return false;
