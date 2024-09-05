@@ -12,20 +12,20 @@
 
 #include "lua_number.hpp"
 
-i64 LuaNumber::ParseInteger(const std::string& s) {
+i64* LuaNumber::ParseInteger(const std::string& s) {
     try {
         i64 n = std::stoi(s);
-        return n;
+        return new i64(n);
     } catch (std::invalid_argument &e) {
-        assert(false && e.what());
+        return nullptr;
     }
 }
 
-f64 LuaNumber::ParseFloat(const std::string& s) {
+f64* LuaNumber::ParseFloat(const std::string& s) {
     try {
         f64 d = std::stod(s);
-        return d;
+        return new f64(d);
     } catch (std::invalid_argument &e) {
-        assert(false && e.what());
+        return nullptr;
     }
 }

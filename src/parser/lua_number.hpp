@@ -18,8 +18,8 @@
 
 class LuaNumber {
 public:
-    static i64 ParseInteger(const std::string& s);
-    static f64 ParseFloat(const std::string& s);
+    static i64* ParseInteger(const std::string& s);
+    static f64* ParseFloat(const std::string& s);
 };
 
 

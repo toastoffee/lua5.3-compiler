@@ -53,6 +53,7 @@ private:
 
     static Expression* parseNumberExpression(Lexer *lexer);
     static Expression* parseTableConstructorExpression(Lexer *lexer);
+    static std::pair<std::vector<std::string>, bool> parseParList(Lexer *lexer);
 
 
 public:

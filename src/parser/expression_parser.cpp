@@ -9,6 +9,7 @@
   */
 
 #include "parser.hpp"
+#include <parser/lua_number.hpp>
 
 // explist ::= exp {‘,’ exp}
 std::vector<Expression *> Parser::ParseExpressionList(Lexer *lexer) {
@@ -255,15 +256,46 @@ Expression *Parser::parseExpression_0(Lexer *lexer) {
 
 Expression *Parser::parseNumberExpression(Lexer *lexer) {
     Token token = lexer->NextToken();
-
+    auto i = LuaNumber::ParseInteger(token.tokenStr);
+    if(i != nullptr) {
+        return new IntegerExpression(token.line, *i);
+    }
+    auto d = LuaNumber::ParseFloat(token.tokenStr);
+    if(d != nullptr) {
+        return new FloatExpression(token.line, *d);
+    }
+    throw std::runtime_error("not a number:" + token.tokenStr);
 }
 
 Expression *Parser::parseTableConstructorExpression(Lexer *lexer) {
     return nullptr;
 }
 
+// functiondef ::= function funcbody
+// funcbody ::= ‘(’ [parlist] ‘)’ block end
 Expression *Parser::parseFuncDefExpression(Lexer *lexer) {
-    return nullptr;
+    int line = lexer->GetLine();                            // function
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_LPAREN);    // (
+    auto pair = parseParList(lexer);       // [parList]
+    auto parList = pair.first;
+    auto isVararg = pair.second;
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_RPAREN);    // )
+    Block *block = ParseBlock(lexer);                       // block
+    lexer->NextTokenOfId(TokenId::TOKEN_KW_END);        // end
+    int lastLine = lexer->GetLine();
+
+    auto fdExp = new FuncDefExpression;
+    fdExp->line = line;
+    fdExp->lastLine = lastLine;
+    fdExp->isVararg = isVararg;
+    fdExp->parList = parList;
+    fdExp->block = block;
+
+    return fdExp;
+}
+
+std::pair<std::vector<std::string>, bool> Parser::parseParList(Lexer *lexer) {
+    return std::vector<std::string>();
 }
 
 Expression *Parser::parsePrefixExp(Lexer *lexer) {
