@@ -13,10 +13,10 @@
 #include "parser.hpp"
 
 //! block ::= {stat} [retStat]
-Block *Parser::ParseBlock(Lexer *lexer) {
+Block *Parser::parseBlock(Lexer *lexer) {
     auto ret = new Block;
-    ret->statements = ParseStatements(lexer);
-    ret->expressions = ParseRetExpressions(lexer);
+    ret->statements = parseStatements(lexer);
+    ret->expressions = parseRetExpressions(lexer);
     ret->lastLine = lexer->GetLine();
     return ret;
 }
@@ -34,6 +34,12 @@ bool Parser::isReturnOrBlockEnd(const Token& token) {
     }
 }
 
+Block *Parser::Parse(const std::string& chunk, const std::string& chunkName) {
+    auto *lexer = new Lexer(chunk, chunkName);
+    auto *block = parseBlock(lexer);
+    lexer->NextTokenOfId(TokenId::TOKEN_EOF);
+    return block;
+}
 
 
 

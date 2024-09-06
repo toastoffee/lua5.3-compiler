@@ -12,18 +12,18 @@
 #include <parser/lua_number.hpp>
 
 // explist ::= exp {‘,’ exp}
-std::vector<Expression *> Parser::ParseExpressionList(Lexer *lexer) {
+std::vector<Expression *> Parser::parseExpressionList(Lexer *lexer) {
     std::vector<Expression *> exps;
 
-    exps.push_back(ParseExpression(lexer));
+    exps.push_back(parseExpression(lexer));
     while(lexer->LookAhead().id == TokenId::TOKEN_SEP_COMMA) {
         lexer->NextToken();
-        exps.push_back(ParseExpression(lexer));
+        exps.push_back(parseExpression(lexer));
     }
     return exps;
 }
 
-std::vector<Expression *> Parser::ParseRetExpressions(Lexer *lexer) {
+std::vector<Expression *> Parser::parseRetExpressions(Lexer *lexer) {
     std::vector<Expression*> ret;
 
     if(lexer->LookAhead().id != TokenId::TOKEN_KW_RETURN) {
@@ -42,7 +42,7 @@ std::vector<Expression *> Parser::ParseRetExpressions(Lexer *lexer) {
         lexer->NextToken();
         return ret;     // empty list
     } else {
-        ret = ParseExpressionList(lexer);
+        ret = parseExpressionList(lexer);
         if(lexer->LookAhead().id == TokenId::TOKEN_SEP_SEMI) {
             lexer->NextToken();
         }
@@ -70,7 +70,7 @@ exp1  ::= exp0 {‘^’ exp2}
 exp0  ::= nil | false | true | Numeral | LiteralString
         | ‘...’ | functiondef | prefixexp | tableconstructor
 */
-Expression *Parser::ParseExpression(Lexer *lexer) {
+Expression *Parser::parseExpression(Lexer *lexer) {
     return parseExpression_12(lexer);
 }
 
@@ -311,21 +311,21 @@ std::pair<Expression *, Expression *> Parser::parseField(Lexer *lexer) {
     Expression *k, *v;
     if(lexer->LookAhead().id == TokenId::TOKEN_SEP_LBRACK) {
         lexer->NextToken();                                     // '['
-        k = ParseExpression(lexer);                             // exp
+        k = parseExpression(lexer);                             // exp
         lexer->NextTokenOfId(TokenId::TOKEN_SEP_RBRACK);    // ']'
         lexer->NextTokenOfId(TokenId::TOKEN_OP_ASSIGN);     // =
-        v = ParseExpression(lexer);                             // exp
+        v = parseExpression(lexer);                             // exp
         return std::make_pair(k, v);
     }
 
-    auto exp = ParseExpression(lexer);
+    auto exp = parseExpression(lexer);
     if(isInstanceOf<NameExpression>(exp)) {
         if(lexer->LookAhead().id == TokenId::TOKEN_OP_ASSIGN) {
             // Name ‘=’ exp => ‘[’ LiteralString ‘]’ = exp
             lexer->NextToken();
             auto nameExp = dynamic_cast<NameExpression *>(exp);
             k = new StringExpression(nameExp->line, nameExp->name);
-            v = ParseExpression(lexer);
+            v = parseExpression(lexer);
             return std::make_pair(k, v);
         }
     }
@@ -346,7 +346,7 @@ Expression *Parser::parseFuncDefExpression(Lexer *lexer) {
     auto parList = pair.first;
     auto isVararg = pair.second;
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_RPAREN);    // )
-    Block *block = ParseBlock(lexer);                       // block
+    Block *block = parseBlock(lexer);                       // block
     lexer->NextTokenOfId(TokenId::TOKEN_KW_END);        // end
     int lastLine = lexer->GetLine();
 
@@ -402,7 +402,7 @@ Expression *Parser::parsePrefixExp(Lexer *lexer) {
 
 Expression *Parser::parseParensExpression(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_LPAREN);    // '('
-    auto exp = ParseExpression(lexer);          // exp
+    auto exp = parseExpression(lexer);          // exp
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_RPAREN);    // ')'
 
     if(isInstanceOf<VarargExpression>(exp)
@@ -423,7 +423,7 @@ Expression *Parser::finishPrefixExpression(Lexer *lexer, Expression *exp) {
         switch (lexer->LookAhead().id) {
             case TokenId::TOKEN_SEP_LBRACK:
                 lexer->NextToken();                                     // '['
-                keyExp = ParseExpression(lexer);                        // exp
+                keyExp = parseExpression(lexer);                        // exp
                 lexer->NextTokenOfId(TokenId::TOKEN_SEP_RBRACK);    // ']'
                 exp = new TableAccessExpression(lexer->GetLine(), exp, keyExp);
             case TokenId::TOKEN_SEP_DOT:
@@ -521,7 +521,7 @@ std::vector<Expression *> Parser::parseArgs(Lexer *lexer) {
         case TokenId::TOKEN_SEP_LPAREN: // '(' [expList] ')'
             lexer->NextToken();
             if(lexer->LookAhead().id != TokenId::TOKEN_SEP_RPAREN) {
-                args = ParseExpressionList(lexer);
+                args = parseExpressionList(lexer);
             }
             lexer->NextTokenOfId(TokenId::TOKEN_SEP_RPAREN);
             return args;

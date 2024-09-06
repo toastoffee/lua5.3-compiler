@@ -64,6 +64,29 @@ private:
     static std::pair<Expression*, Expression*> parseField(Lexer *lexer);
     static bool isFieldSep(TokenId tokenId);
 
+    static Block *parseBlock(Lexer *lexer);
+
+    // statement parser
+    static std::vector<Statement *> parseStatements(Lexer *lexer);
+    static Statement* parseStatement(Lexer *lexer);
+    static Statement* parseEmptyStatement(Lexer *lexer);
+    static Statement* parseBreakStatement(Lexer *lexer);
+    static Statement* parseLabelStatement(Lexer *lexer);
+    static Statement* parseGotoStatement(Lexer *lexer);
+    static Statement* parseDoStatement(Lexer *lexer);
+    static Statement* parseWhileStatement(Lexer *lexer);
+    static Statement* parseRepeatStatement(Lexer *lexer);
+    static Statement* parseIfStatement(Lexer *lexer);
+    static Statement* parseForStatement(Lexer *lexer);
+    static Statement* parseFuncDefStatement(Lexer *lexer);
+    static Statement* parseLocalAssignOrFuncDefStatement(Lexer *lexer);
+    static Statement* parseAssignOrFuncCallStatement(Lexer *lexer);
+
+    // expression parser
+    static std::vector<Expression *> parseRetExpressions(Lexer *lexer);
+    static std::vector<Expression *> parseExpressionList(Lexer *lexer);
+    static Expression* parseExpression(Lexer *lexer);
+
     static Expression* optimizeUnaryOp(UnopExpression* exp);
     static Expression* optimizeUnm(UnopExpression* exp);
     static Expression* optimizeNot(UnopExpression* exp);
@@ -71,29 +94,8 @@ private:
 
 
 public:
-    static Block *ParseBlock(Lexer *lexer);
 
-    // statement parser
-    static std::vector<Statement *> ParseStatements(Lexer *lexer);
-    static Statement* ParseStatement(Lexer *lexer);
-    static Statement* ParseEmptyStatement(Lexer *lexer);
-    static Statement* ParseBreakStatement(Lexer *lexer);
-    static Statement* ParseLabelStatement(Lexer *lexer);
-    static Statement* ParseGotoStatement(Lexer *lexer);
-    static Statement* ParseDoStatement(Lexer *lexer);
-    static Statement* ParseWhileStatement(Lexer *lexer);
-    static Statement* ParseRepeatStatement(Lexer *lexer);
-    static Statement* ParseIfStatement(Lexer *lexer);
-    static Statement* ParseForStatement(Lexer *lexer);
-    static Statement* ParseFuncDefStatement(Lexer *lexer);
-    static Statement* ParseLocalAssignOrFuncDefStatement(Lexer *lexer);
-    static Statement* ParseAssignOrFuncCallStatement(Lexer *lexer);
-
-    // expression parser
-    static std::vector<Expression *> ParseRetExpressions(Lexer *lexer);
-    static std::vector<Expression *> ParseExpressionList(Lexer *lexer);
-    static Expression* ParseExpression(Lexer *lexer);
-
+    static Block* Parse(const std::string& chunk, const std::string& chunkName);
 
 };
 

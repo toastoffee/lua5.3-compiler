@@ -31,10 +31,10 @@
     | functioncall
 */
 
-std::vector<Statement *> Parser::ParseStatements(Lexer *lexer) {
+std::vector<Statement *> Parser::parseStatements(Lexer *lexer) {
     std::vector<Statement*> stats;
     while(!isReturnOrBlockEnd(lexer->LookAhead())) {
-        auto statement = ParseStatement(lexer);
+        auto statement = parseStatement(lexer);
         if (!isInstanceOf<EmptyStatement>(statement)) {
             stats.push_back(statement);
         }
@@ -42,31 +42,31 @@ std::vector<Statement *> Parser::ParseStatements(Lexer *lexer) {
     return stats;
 }
 
-Statement* Parser::ParseStatement(Lexer *lexer) {
+Statement* Parser::parseStatement(Lexer *lexer) {
     switch(lexer->LookAhead().id) {
-        case TokenId::TOKEN_SEP_SEMI:    return ParseEmptyStatement(lexer);
-        case TokenId::TOKEN_KW_BREAK:    return ParseBreakStatement(lexer);
-        case TokenId::TOKEN_SEP_LABEL:   return ParseLabelStatement(lexer);
-        case TokenId::TOKEN_KW_GOTO:     return ParseGotoStatement(lexer);
-        case TokenId::TOKEN_KW_DO:       return ParseDoStatement(lexer);
-        case TokenId::TOKEN_KW_WHILE:    return ParseWhileStatement(lexer);
-        case TokenId::TOKEN_KW_REPEAT:   return ParseRepeatStatement(lexer);
-        case TokenId::TOKEN_KW_IF:       return ParseIfStatement(lexer);
-        case TokenId::TOKEN_KW_FOR:      return ParseForStatement(lexer);
-        case TokenId::TOKEN_KW_FUNCTION: return ParseFuncDefStatement(lexer);
-        case TokenId::TOKEN_KW_LOCAL:    return ParseLocalAssignOrFuncDefStatement(lexer);
-        default:                         return ParseAssignOrFuncCallStatement(lexer);
+        case TokenId::TOKEN_SEP_SEMI:    return parseEmptyStatement(lexer);
+        case TokenId::TOKEN_KW_BREAK:    return parseBreakStatement(lexer);
+        case TokenId::TOKEN_SEP_LABEL:   return parseLabelStatement(lexer);
+        case TokenId::TOKEN_KW_GOTO:     return parseGotoStatement(lexer);
+        case TokenId::TOKEN_KW_DO:       return parseDoStatement(lexer);
+        case TokenId::TOKEN_KW_WHILE:    return parseWhileStatement(lexer);
+        case TokenId::TOKEN_KW_REPEAT:   return parseRepeatStatement(lexer);
+        case TokenId::TOKEN_KW_IF:       return parseIfStatement(lexer);
+        case TokenId::TOKEN_KW_FOR:      return parseForStatement(lexer);
+        case TokenId::TOKEN_KW_FUNCTION: return parseFuncDefStatement(lexer);
+        case TokenId::TOKEN_KW_LOCAL:    return parseLocalAssignOrFuncDefStatement(lexer);
+        default:                         return parseAssignOrFuncCallStatement(lexer);
     }
 
 }
 
-Statement *Parser::ParseEmptyStatement(Lexer *lexer) {
+Statement *Parser::parseEmptyStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_SEMI);
     return new EmptyStatement;
 }
 
 // break
-Statement *Parser::ParseBreakStatement(Lexer *lexer) {
+Statement *Parser::parseBreakStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_BREAK);
 
     auto stat = new BreakStatement;
@@ -75,7 +75,7 @@ Statement *Parser::ParseBreakStatement(Lexer *lexer) {
 }
 
 // ‘::’ Name ‘::’
-Statement *Parser::ParseLabelStatement(Lexer *lexer) {
+Statement *Parser::parseLabelStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_LABEL); // ::
     auto identifier = lexer->NextIdentifier();  // name
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_LABEL); // ::
@@ -86,7 +86,7 @@ Statement *Parser::ParseLabelStatement(Lexer *lexer) {
 }
 
 // goto Name
-Statement *Parser::ParseGotoStatement(Lexer *lexer) {
+Statement *Parser::parseGotoStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_GOTO);   // goto
     auto identifier = lexer->NextIdentifier();  // name
 
@@ -96,9 +96,9 @@ Statement *Parser::ParseGotoStatement(Lexer *lexer) {
 }
 
 // do block end
-Statement *Parser::ParseDoStatement(Lexer *lexer) {
+Statement *Parser::parseDoStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);     // do
-    Block* block = ParseBlock(lexer);                   // block
+    Block* block = parseBlock(lexer);                   // block
     lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
 
     auto stat = new DoStatement;
@@ -107,11 +107,11 @@ Statement *Parser::ParseDoStatement(Lexer *lexer) {
 }
 
 // while exp do block end
-Statement *Parser::ParseWhileStatement(Lexer *lexer) {
+Statement *Parser::parseWhileStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_WHILE);  // while
-    Expression *exp = ParseExpression(lexer);           // exp
+    Expression *exp = parseExpression(lexer);           // exp
     lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);     // do
-    Block *block = ParseBlock(lexer);                   // block
+    Block *block = parseBlock(lexer);                   // block
     lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
 
     auto stat = new WhileStatement;
@@ -121,11 +121,11 @@ Statement *Parser::ParseWhileStatement(Lexer *lexer) {
 }
 
 // repeat block until exp
-Statement *Parser::ParseRepeatStatement(Lexer *lexer) {
+Statement *Parser::parseRepeatStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_REPEAT); // repeat
-    Block *block = ParseBlock(lexer);                   // block
+    Block *block = parseBlock(lexer);                   // block
     lexer->NextTokenOfId(TokenId::TOKEN_KW_UNTIL);  // until
-    Expression *exp = ParseExpression(lexer);           // exp
+    Expression *exp = parseExpression(lexer);           // exp
 
     auto stat = new RepeatStatement;
     stat->block = block;
@@ -134,20 +134,20 @@ Statement *Parser::ParseRepeatStatement(Lexer *lexer) {
 }
 
 // if exp then block {elseif exp then block} [else block] end
-Statement *Parser::ParseIfStatement(Lexer *lexer) {
+Statement *Parser::parseIfStatement(Lexer *lexer) {
     std::vector<Expression *> exps;
     std::vector<Block *> blocks;
 
     lexer->NextTokenOfId(TokenId::TOKEN_KW_IF);     // if
-    exps.push_back(ParseExpression(lexer));             // exp
+    exps.push_back(parseExpression(lexer));             // exp
     lexer->NextTokenOfId(TokenId::TOKEN_KW_THEN);   // then
-    blocks.push_back(ParseBlock(lexer));                // block
+    blocks.push_back(parseBlock(lexer));                // block
 
     while(lexer->LookAhead().id == TokenId::TOKEN_KW_ELSEIF) {
         lexer->NextToken();                                 // elseif
-        exps.push_back(ParseExpression(lexer));             // exp
+        exps.push_back(parseExpression(lexer));             // exp
         lexer->NextTokenOfId(TokenId::TOKEN_KW_THEN);   // then
-        blocks.push_back(ParseBlock(lexer));                // block
+        blocks.push_back(parseBlock(lexer));                // block
     }
 
     // else block => elseif true then block
@@ -157,7 +157,7 @@ Statement *Parser::ParseIfStatement(Lexer *lexer) {
         auto trueExp = new TrueExpression;          // true
         trueExp->line = lexer->GetLine();
         exps.push_back(trueExp);
-        blocks.push_back(ParseBlock(lexer));        // block
+        blocks.push_back(parseBlock(lexer));        // block
     }
 
     lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
@@ -169,7 +169,7 @@ Statement *Parser::ParseIfStatement(Lexer *lexer) {
 
 // for Name ‘=’ exp ‘,’ exp [‘,’ exp] do block end
 // for namelist in explist do block end
-Statement *Parser::ParseForStatement(Lexer *lexer) {
+Statement *Parser::parseForStatement(Lexer *lexer) {
     int lineOfFor = lexer->NextTokenOfId(TokenId::TOKEN_KW_FOR).line;
     auto name = lexer->NextIdentifier().tokenStr;
     if(lexer->LookAhead().id == TokenId::TOKEN_OP_ASSIGN) {
@@ -187,13 +187,13 @@ Statement *Parser::parseForNumStatement(Lexer *lexer, std::string varName, int l
     stat->varName = varName;                                // name
 
     lexer->NextTokenOfId(TokenId::TOKEN_OP_ASSIGN);     // =
-    stat->initExp = ParseExpression(lexer);                 // exp
+    stat->initExp = parseExpression(lexer);                 // exp
     lexer->NextTokenOfId(TokenId::TOKEN_SEP_COMMA);     // ,
-    stat->limitExp = ParseExpression(lexer);                // exp
+    stat->limitExp = parseExpression(lexer);                // exp
 
     if(lexer->LookAhead().id == TokenId::TOKEN_SEP_COMMA) {
         lexer->NextToken();                                 // ,
-        stat->stepExp = ParseExpression(lexer);             // exp
+        stat->stepExp = parseExpression(lexer);             // exp
     } else {
         auto stepExp = new IntegerExpression;
         stepExp->line = lexer->GetLine();
@@ -203,7 +203,7 @@ Statement *Parser::parseForNumStatement(Lexer *lexer, std::string varName, int l
 
     lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);         // do
     stat->lineOfDo = lexer->GetLine();
-    stat->block = ParseBlock(lexer);                        // block
+    stat->block = parseBlock(lexer);                        // block
     lexer->NextTokenOfId(TokenId::TOKEN_KW_END);        // end
 
     return stat;
@@ -217,10 +217,10 @@ Statement *Parser::parseForInStatement(Lexer *lexer, std::string name0) {
 
     stat->nameList = finishNameList(lexer, name0);      // namelist
     lexer->NextTokenOfId(TokenId::TOKEN_KW_IN);     // in
-    stat->exps = ParseExpressionList(lexer);            // explist
+    stat->exps = parseExpressionList(lexer);            // explist
     lexer->NextTokenOfId(TokenId::TOKEN_KW_DO);     // do
     stat->lineOfDo = lexer->GetLine();                  //
-    stat->block = ParseBlock(lexer);                    // block
+    stat->block = parseBlock(lexer);                    // block
     lexer->NextTokenOfId(TokenId::TOKEN_KW_END);    // end
 
     return stat;
@@ -251,7 +251,7 @@ not to `local f = function () body end`
  contains references to f.)
 */
 // local function Name funcbody
-Statement *Parser::ParseFuncDefStatement(Lexer *lexer) {
+Statement *Parser::parseFuncDefStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_FUNCTION);   // function
     auto pair = parseFuncName(lexer);  // funcName
     auto fnExp = pair.first;
@@ -271,7 +271,7 @@ Statement *Parser::ParseFuncDefStatement(Lexer *lexer) {
 
 // local function Name funcbody
 // local namelist [‘=’ explist]
-Statement *Parser::ParseLocalAssignOrFuncDefStatement(Lexer *lexer) {
+Statement *Parser::parseLocalAssignOrFuncDefStatement(Lexer *lexer) {
     lexer->NextTokenOfId(TokenId::TOKEN_KW_LOCAL);
     if(lexer->LookAhead().id == TokenId::TOKEN_KW_FUNCTION) {
         return parseLocalFuncDefStatement(lexer);
@@ -301,7 +301,7 @@ Statement *Parser::parseLocalVarDeclStatement(Lexer *lexer) {
     std::vector<Expression *> expList;
     if(lexer->LookAhead().id == TokenId::TOKEN_OP_ASSIGN) {
         lexer->NextToken();                         // ==
-        expList = ParseExpressionList(lexer);       // explist
+        expList = parseExpressionList(lexer);       // explist
     }
     int lastLine = lexer->GetLine();
 
@@ -313,7 +313,7 @@ Statement *Parser::parseLocalVarDeclStatement(Lexer *lexer) {
     return stat;
 }
 
-Statement *Parser::ParseAssignOrFuncCallStatement(Lexer *lexer) {
+Statement *Parser::parseAssignOrFuncCallStatement(Lexer *lexer) {
     Expression *prefixExp = parsePrefixExp(lexer);
     if(isInstanceOf<FuncCallExpression>(prefixExp)) {
         auto stat = new FuncCallStatement;
@@ -328,7 +328,7 @@ Statement *Parser::ParseAssignOrFuncCallStatement(Lexer *lexer) {
 Statement *Parser::parseAssignStatement(Lexer *lexer, Expression *var0) {
     auto varList = parseVarList(lexer, var0);    // varList
     lexer->NextTokenOfId(TokenId::TOKEN_OP_ASSIGN);             // =
-    auto expList = ParseExpressionList(lexer);   // expList
+    auto expList = parseExpressionList(lexer);   // expList
     int lastLine = lexer->GetLine();
 
     auto stat = new AssignStatement;
