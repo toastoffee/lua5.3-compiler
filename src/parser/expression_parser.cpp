@@ -500,10 +500,15 @@ Expression *Parser::finishFuncCallExpression(Lexer *lexer, Expression *exp) {
     fcExp->line = lexer->GetLine();                 //
     fcExp->args = parseArgs(lexer);                 // args
     fcExp->lastLine = lexer->GetLine();             //
-    return new FuncCallExpression
+    return fcExp;
 }
 
 StringExpression *Parser::parseNameExpression(Lexer *lexer) {
+    if(lexer->LookAhead().id == TokenId::TOKEN_SEP_COLON) {
+        lexer->NextToken();
+        Token token = lexer->NextIdentifier();
+        return new StringExpression(token.line, token.tokenStr);
+    }
     return nullptr;
 }
 
