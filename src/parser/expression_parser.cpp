@@ -420,22 +420,26 @@ Expression *Parser::finishPrefixExpression(Lexer *lexer, Expression *exp) {
     Expression *keyExp;
     Token token;
     while(true) {
-        switch (lexer->LookAhead().id) {
+        TokenId t = lexer->LookAhead().id;
+        switch (t) {
             case TokenId::TOKEN_SEP_LBRACK:
                 lexer->NextToken();                                     // '['
                 keyExp = parseExpression(lexer);                        // exp
                 lexer->NextTokenOfId(TokenId::TOKEN_SEP_RBRACK);    // ']'
                 exp = new TableAccessExpression(lexer->GetLine(), exp, keyExp);
+                break;
             case TokenId::TOKEN_SEP_DOT:
                 lexer->NextToken();                     // '.'
                 token = lexer->NextIdentifier();        // name
                 keyExp = new StringExpression(token.line, token.tokenStr);
                 exp = new TableAccessExpression(token.line, exp, keyExp);
+                break;
             case TokenId::TOKEN_SEP_COLON:
             case TokenId::TOKEN_SEP_LPAREN:
             case TokenId::TOKEN_SEP_LCURLY:
             case TokenId::TOKEN_STRING:
                 exp = finishFuncCallExpression(lexer, exp);     // [':' name] args
+                break;
             default:
                 return exp;
         }

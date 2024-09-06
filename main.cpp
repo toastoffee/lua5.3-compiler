@@ -7,7 +7,7 @@
 int main() {
 
     // load file
-    FILE* file = fopen("../lua_tests/hello.lua", "rb");
+    FILE* file = fopen("../lua_tests/variable.lua", "rb");
 
     assert(file && "failed to open file!");
 
@@ -27,7 +27,15 @@ int main() {
 
     auto block = Parser::Parse(sourceCode, "max.lua");
 
+    TokenId id = TokenId::TOKEN_SEP_DOT;
 
+    switch (id) {
+        case TokenId::TOKEN_SEP_COLON:
+        case TokenId::TOKEN_SEP_LPAREN:
+        case TokenId::TOKEN_SEP_LCURLY:
+        case TokenId::TOKEN_STRING:
+            std::cout << "mf" << std::endl;
+    }
 
     return 0;
 }
