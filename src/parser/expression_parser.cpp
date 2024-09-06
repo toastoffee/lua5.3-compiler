@@ -499,6 +499,7 @@ std::pair<Expression *, bool> Parser::parseFuncName(Lexer *lexer) {
 
 Expression *Parser::finishFuncCallExpression(Lexer *lexer, Expression *exp) {
     auto fcExp = new FuncCallExpression;
+    fcExp->prefixExp = exp;
     fcExp->nameExp = parseNameExpression(lexer);    // [':' name]
     fcExp->line = lexer->GetLine();                 //
     fcExp->args = parseArgs(lexer);                 // args

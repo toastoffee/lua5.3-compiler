@@ -16,7 +16,7 @@
 Block *Parser::parseBlock(Lexer *lexer) {
     auto ret = new Block;
     ret->statements = parseStatements(lexer);
-    ret->expressions = parseRetExpressions(lexer);
+    ret->retExpressions = parseRetExpressions(lexer);
     ret->lastLine = lexer->GetLine();
     return ret;
 }

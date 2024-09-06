@@ -43,7 +43,7 @@ Token Lexer::NextToken() {
         m_nextToken.line = 0;
 
         // return next token
-        return m_nextToken;
+        return Token {.line = m_line, .id = m_nextToken.id, .tokenStr = m_nextToken.tokenStr};
     }
 
     skipBlankSpaces();

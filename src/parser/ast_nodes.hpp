@@ -34,7 +34,7 @@ struct Expression;
 struct Block : Node {
     int lastLine;
     std::vector<Statement*> statements;
-    std::vector<Expression*> expressions;
+    std::vector<Expression*> retExpressions;
 };
 
 struct Statement : Node {};

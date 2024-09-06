@@ -2,21 +2,12 @@
 
 #include <lexer/lexer.hpp>
 #include <parser/ast_nodes.hpp>
-
-struct A {
-    virtual ~A() = default;
-    int a;
-};
-
-struct B {
-    virtual ~B() = default;
-    int b;
-};
+#include <parser/parser.hpp>
 
 int main() {
 
     // load file
-    FILE* file = fopen("../lua_tests/closure.lua", "rb");
+    FILE* file = fopen("../lua_tests/hello.lua", "rb");
 
     assert(file && "failed to open file!");
 
@@ -32,9 +23,11 @@ int main() {
 
 
     // test lexer
-    Lexer::TestLexer(sourceCode, "max.lua");
+//    Lexer::TestLexer(sourceCode, "max.lua");
 
-    std::map<int*, int> m;
+    auto block = Parser::Parse(sourceCode, "max.lua");
+
+
 
     return 0;
 }
