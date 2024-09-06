@@ -282,6 +282,9 @@ struct FuncDefExpression : Expression {
 
 //! Paren expressions
 struct ParensExpression : Expression {
+    ParensExpression() = default;
+    explicit ParensExpression(Expression *exp) : exp(exp) {}
+
     Expression *exp{};
 };
 
@@ -302,10 +305,17 @@ struct TableAccessExpression : Expression {
 // functioncall ::=  prefixexp [':' Name] args
 // args ::=  '(' [explist] ')' | tableconstructor | LiteralString
 struct FuncCallExpression : Expression {
-    int line;       // line of '('
-    int lastLine;   // line of ')'
-    Expression *prefixExp;
-    StringExpression *nameExp;
+    FuncCallExpression() = default;
+
+    FuncCallExpression(int line, int lastLine, Expression *prefixExp, StringExpression *nameExp,
+                       const std::vector<Expression *> &args)
+                       : line(line), lastLine(lastLine), prefixExp(prefixExp),
+                       nameExp(nameExp), args(args) {}
+
+    int line{};       // line of '('
+    int lastLine{};   // line of ')'
+    Expression *prefixExp{};
+    StringExpression *nameExp{};
     std::vector<Expression*> args;
 };
 

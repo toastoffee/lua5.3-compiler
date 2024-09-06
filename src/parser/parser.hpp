@@ -56,6 +56,9 @@ private:
     static Expression* parseParensExpression(Lexer *lexer);
     static Expression* finishPrefixExpression(Lexer *lexer, Expression *exp);
     static Expression* finishFuncCallExpression(Lexer *lexer, Expression *exp);
+    static StringExpression* parseNameExpression(Lexer *lexer);
+    static std::vector<Expression*> parseArgs(Lexer *lexer);
+
     static std::pair<std::vector<std::string>, bool> parseParList(Lexer *lexer);
     static std::pair<std::vector<Expression *>, std::vector<Expression *>> parseFieldList(Lexer *lexer);
     static std::pair<Expression*, Expression*> parseField(Lexer *lexer);

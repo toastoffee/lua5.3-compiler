@@ -398,7 +398,19 @@ Expression *Parser::parsePrefixExp(Lexer *lexer) {
 }
 
 Expression *Parser::parseParensExpression(Lexer *lexer) {
-    return nullptr;
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_LPAREN);    // '('
+    auto exp = ParseExpression(lexer);          // exp
+    lexer->NextTokenOfId(TokenId::TOKEN_SEP_RPAREN);    // ')'
+
+    if(isInstanceOf<VarargExpression>(exp)
+            || isInstanceOf<FuncCallExpression>(exp)
+            || isInstanceOf<NameExpression>(exp)
+            || isInstanceOf<TableAccessExpression>(exp)) {
+        return new ParensExpression(exp);
+    }
+
+    // no need to keep parens
+    return exp;
 }
 
 Expression *Parser::finishPrefixExpression(Lexer *lexer, Expression *exp) {
@@ -480,4 +492,35 @@ std::pair<Expression *, bool> Parser::parseFuncName(Lexer *lexer) {
     }
 
     return std::make_pair(exp, hasColon);
+}
+
+Expression *Parser::finishFuncCallExpression(Lexer *lexer, Expression *exp) {
+    auto fcExp = new FuncCallExpression;
+    fcExp->nameExp = parseNameExpression(lexer);    // [':' name]
+    fcExp->line = lexer->GetLine();                 //
+    fcExp->args = parseArgs(lexer);                 // args
+    fcExp->lastLine = lexer->GetLine();             //
+    return new FuncCallExpression
+}
+
+StringExpression *Parser::parseNameExpression(Lexer *lexer) {
+    return nullptr;
+}
+
+std::vector<Expression *> Parser::parseArgs(Lexer *lexer) {
+    std::vector<Expression *> args;
+    switch (lexer->LookAhead().id) {
+        case TokenId::TOKEN_SEP_LPAREN: // '(' [expList] ')'
+            lexer->NextToken();
+            if(lexer->LookAhead().id != TokenId::TOKEN_SEP_RPAREN) {
+                args = ParseExpressionList(lexer);
+            }
+            lexer->NextTokenOfId(TokenId::TOKEN_SEP_RPAREN);
+            return args;
+        case TokenId::TOKEN_SEP_LCURLY: // '{' [fieldList] '}'
+            return std::vector<Expression *>{ parseTableConstructorExpression(lexer) };
+        default:                        // literal string
+            auto token = lexer->NextTokenOfId(TokenId::TOKEN_STRING);
+            return std::vector<Expression *>{ new StringExpression(token.line, token.tokenStr) };
+    }
 }
