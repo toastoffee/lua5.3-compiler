@@ -19,4 +19,5 @@ add_executable(lua5_3_compiler main.cpp
         src/parser/expression_parser.cpp
         src/parser/lua_number.cpp
         src/parser/lua_number.hpp
+        src/parser/expression_optimize.cpp
 )

@@ -64,6 +64,11 @@ private:
     static std::pair<Expression*, Expression*> parseField(Lexer *lexer);
     static bool isFieldSep(TokenId tokenId);
 
+    static Expression* optimizeUnaryOp(UnopExpression* exp);
+    static Expression* optimizeUnm(UnopExpression* exp);
+    static Expression* optimizeNot(UnopExpression* exp);
+    static Expression* optimizeBnot(UnopExpression* exp);
+
 
 public:
     static Block *ParseBlock(Lexer *lexer);

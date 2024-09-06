@@ -207,14 +207,17 @@ Expression *Parser::parseExpression_3(Lexer *lexer) { // *, %, /, //
 
 Expression *Parser::parseExpression_2(Lexer *lexer) { // {(`not` | `#` | `-` | `~`)} exp1
     Token op;
+    UnopExpression* exp;
     switch (lexer->LookAhead().id) {
         case TokenId::TOKEN_OP_UNM:
         case TokenId::TOKEN_OP_BNOT:
         case TokenId::TOKEN_OP_LEN:
         case TokenId::TOKEN_OP_NOT:
             op = lexer->NextToken();
-            auto exp = new UnopExpression(op.line, op.id, parseExpression_2(lexer));
+            exp = new UnopExpression(op.line, op.id, parseExpression_2(lexer));
             return exp;
+        default:
+            break;
     }
     return parseExpression_1(lexer);
 }

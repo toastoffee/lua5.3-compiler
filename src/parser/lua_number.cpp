@@ -29,3 +29,7 @@ f64* LuaNumber::ParseFloat(const std::string& s) {
         return nullptr;
     }
 }
+
+bool LuaNumber::IsInteger(f64 d) {
+    return d == (int)d;
+}

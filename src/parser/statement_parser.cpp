@@ -337,3 +337,4 @@ Statement *Parser::parseAssignStatement(Lexer *lexer, Expression *var0) {
     stat->expList = expList;
     return stat;
 }
+
