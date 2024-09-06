@@ -387,8 +387,47 @@ std::pair<std::vector<std::string>, bool> Parser::parseParList(Lexer *lexer) {
 }
 
 Expression *Parser::parsePrefixExp(Lexer *lexer) {
+    Expression *exp;
+    if(lexer->LookAhead().id == TokenId::TOKEN_IDENTIFIER) {
+        Token token = lexer->NextIdentifier();      // name
+        exp = new NameExpression(token.line, token.tokenStr);
+    } else {
+        exp = parseParensExpression(lexer);
+    }
+    return finishPrefixExpression(lexer, exp);
+}
+
+Expression *Parser::parseParensExpression(Lexer *lexer) {
     return nullptr;
 }
+
+Expression *Parser::finishPrefixExpression(Lexer *lexer, Expression *exp) {
+    Expression *keyExp;
+    Token token;
+    while(true) {
+        switch (lexer->LookAhead().id) {
+            case TokenId::TOKEN_SEP_LBRACK:
+                lexer->NextToken();                                     // '['
+                keyExp = ParseExpression(lexer);                        // exp
+                lexer->NextTokenOfId(TokenId::TOKEN_SEP_RBRACK);    // ']'
+                exp = new TableAccessExpression(lexer->GetLine(), exp, keyExp);
+            case TokenId::TOKEN_SEP_DOT:
+                lexer->NextToken();                     // '.'
+                token = lexer->NextIdentifier();        // name
+                keyExp = new StringExpression(token.line, token.tokenStr);
+                exp = new TableAccessExpression(token.line, exp, keyExp);
+            case TokenId::TOKEN_SEP_COLON:
+            case TokenId::TOKEN_SEP_LPAREN:
+            case TokenId::TOKEN_SEP_LCURLY:
+            case TokenId::TOKEN_STRING:
+                exp = finishFuncCallExpression(lexer, exp);     // [':' name] args
+            default:
+                return exp;
+        }
+        return exp;
+    }
+}
+
 
 // varlist ::= var {‘,’ var}
 std::vector<Expression *> Parser::parseVarList(Lexer *lexer, Expression *var0) {
