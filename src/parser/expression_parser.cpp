@@ -389,6 +389,11 @@ std::pair<std::vector<std::string>, bool> Parser::parseParList(Lexer *lexer) {
     return std::make_pair(names, isVararg);
 }
 
+// prefixexp ::= Name
+//      | ‘(’ exp ‘)’
+//      | prefixexp ‘[’ exp ‘]’
+//      | prefixexp ‘.’ Name
+//      | prefixexp [‘:’ Name] args
 Expression *Parser::parsePrefixExp(Lexer *lexer) {
     Expression *exp;
     if(lexer->LookAhead().id == TokenId::TOKEN_IDENTIFIER) {
