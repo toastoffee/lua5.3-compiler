@@ -94,7 +94,7 @@ void FuncInfo::ExitScope() {
             m_insts[pc] = i;
         }
     }
-    
+
     m_scopeLv--;
     for (const auto& pair : m_locNames) {
         if(pair.second->scopeLv > m_scopeLv) {  // exit scope
