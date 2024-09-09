@@ -25,7 +25,16 @@ int main() {
     // test lexer
 //    Lexer::TestLexer(sourceCode, "max.lua");
 
-    auto block = Parser::Parse(sourceCode, "max.lua");
+    // test parser
+//    auto block = Parser::Parse(sourceCode, "max.lua");
+
+
+    std::map<int, int> testMap;
+    testMap[1] = 1;
+    std::cout << testMap[2];
+    std::cout << testMap.size();
+    std::cout << (testMap.find(3) == testMap.end());
+    std::cout << (testMap.find(2) == testMap.end());
 
     return 0;
 }

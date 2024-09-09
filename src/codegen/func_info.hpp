@@ -18,8 +18,20 @@
 
 #include <map>
 
-struct FuncInfo {
-    std::map<LuaConstant, int> constants;
+class FuncInfo {
+private:
+    std::map<LuaConstant *, int> m_constants;
+    int                          m_usedRegs;
+    int                          m_maxRegs;
+
+
+public:
+    int IndexOfConstant(LuaConstant* k);
+
+    int AllocReg();
+    void FreeReg();
+    int AllocRegs(int n);
+    void FreeRegs(int n);
 };
 
 

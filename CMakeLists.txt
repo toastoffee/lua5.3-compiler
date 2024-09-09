@@ -22,5 +22,6 @@ add_executable(lua5_3_compiler main.cpp
         src/parser/expression_optimize.cpp
         src/codegen/func_info.hpp
         src/lua_constants.hpp
+        src/codegen/func_info.cpp
 
 )
