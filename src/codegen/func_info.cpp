@@ -9,6 +9,7 @@
   */
 
 #include "func_info.hpp"
+#include "opcodes.hpp"
 
 int FuncInfo::IndexOfConstant(LuaConstant *k) {
     if(m_constants.find(k) == m_constants.end()) {
@@ -50,8 +51,13 @@ void FuncInfo::FreeRegs(int n) {
     }
 }
 
-void FuncInfo::EnterScope() {
+void FuncInfo::EnterScope(bool breakable) {
     m_scopeLv++;
+    if (breakable) {
+        m_breaks.push_back(new std::vector<int>);
+    } else {
+        m_breaks.push_back(nullptr);
+    }
 }
 
 int FuncInfo::AddLocVar(const std::string& name) {
@@ -77,6 +83,18 @@ int FuncInfo::SlotOfLocVar(const std::string& name) {
 }
 
 void FuncInfo::ExitScope() {
+    auto pendingBreakJmps = m_breaks.back();
+    m_breaks.pop_back();
+
+    if(pendingBreakJmps != nullptr) {
+        int a = GetJmpArgA();
+        for (int pc : *pendingBreakJmps) {
+            int sBx = Pc() - pc;
+            int i = (sBx + MAX_ARG_sBx) << 14 | a << 6 | OP_JMP;
+            m_insts[pc] = i;
+        }
+    }
+    
     m_scopeLv--;
     for (const auto& pair : m_locNames) {
         if(pair.second->scopeLv > m_scopeLv) {  // exit scope
@@ -95,4 +113,14 @@ void FuncInfo::RemoveLocVar(LocVarInfo *locVar) {
     } else {
         m_locNames[locVar->name] = locVar->prev;
     }
+}
+
+void FuncInfo::AddBreakJmp(int pc) {
+    for (int i = m_scopeLv; i >= 0; --i) {
+        if (m_breaks[i] != nullptr) {   // 循环块
+            m_breaks[i]->push_back(pc);
+            return;
+        }
+    }
+    assert(false && "<break> at line ? is not inside a loop!");
 }
