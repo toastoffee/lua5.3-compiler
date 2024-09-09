@@ -16,14 +16,26 @@
 #include <types.hpp>
 #include <lua_constants.hpp>
 
+#include <string>
 #include <map>
+#include <vector>
+
+struct LocVarInfo {
+    std::string name;
+    LocVarInfo* prev;
+    int scopeLv;
+    int slot;
+    bool captured;
+};
 
 class FuncInfo {
 private:
-    std::map<LuaConstant *, int> m_constants;
-    int                          m_usedRegs;
-    int                          m_maxRegs;
-
+    std::map<LuaConstant *, int>        m_constants;
+    int                                 m_usedRegs;
+    int                                 m_maxRegs;
+    int                                 m_scopeLv;
+    std::vector<LocVarInfo *>           m_locVars;
+    std::map<std::string, LocVarInfo *> m_locNames;
 
 public:
     int IndexOfConstant(LuaConstant* k);
@@ -32,6 +44,12 @@ public:
     void FreeReg();
     int AllocRegs(int n);
     void FreeRegs(int n);
+
+    void EnterScope();
+    int AddLocVar(const std::string& name);
+    int SlotOfLocVar(const std::string& name);
+    void ExitScope();
+    void RemoveLocVar(LocVarInfo* locVar);
 };
 
 

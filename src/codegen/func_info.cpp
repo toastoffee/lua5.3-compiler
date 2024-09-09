@@ -49,3 +49,50 @@ void FuncInfo::FreeRegs(int n) {
         FreeReg();
     }
 }
+
+void FuncInfo::EnterScope() {
+    m_scopeLv++;
+}
+
+int FuncInfo::AddLocVar(const std::string& name) {
+    auto newVar = new LocVarInfo {
+        .name = name,
+        .prev = m_locNames[name],
+        .scopeLv = m_scopeLv,
+        .slot = AllocReg()
+    };
+
+    m_locVars.push_back(newVar);
+    m_locNames[name] = newVar;
+
+    return newVar->slot;
+}
+
+int FuncInfo::SlotOfLocVar(const std::string& name) {
+    if(m_locNames.find(name) != m_locNames.end()) {
+        return m_locNames[name]->slot;
+    } else {
+        return -1;
+    }
+}
+
+void FuncInfo::ExitScope() {
+    m_scopeLv--;
+    for (const auto& pair : m_locNames) {
+        if(pair.second->scopeLv > m_scopeLv) {  // exit scope
+            RemoveLocVar(pair.second);
+        }
+    }
+}
+
+void FuncInfo::RemoveLocVar(LocVarInfo *locVar) {
+    // unbind local variable, recycle register
+    FreeReg();
+    if(locVar->prev == nullptr) {
+        m_locNames.erase(locVar->name);
+    } else if(locVar->prev->scopeLv == locVar->scopeLv) {
+        RemoveLocVar(locVar->prev);
+    } else {
+        m_locNames[locVar->name] = locVar->prev;
+    }
+}
